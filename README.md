@@ -20,5 +20,8 @@ The report shows mutation statistics with the change since the last successful b
 and you can drill down to the annotated source code at class level to see what mutations 
 happened on each line.
 
+## Development
+Ensure that your IDE is [setup correctly](https://wiki.jenkins.io/display/JENKINS/Plugin+tutorial#Plugintutorial-SettingupaproductiveenvironmentwithyourIDE).
+
 ## Releasing
 Run `mvn release:prepare release:perform` but ensure that your Maven `settings.xml` has been [set up with your jenkins-ci.org credentials](https://wiki.jenkins.io/display/JENKINS/Hosting+Plugins#HostingPlugins-Releasingtojenkins-ci.org)

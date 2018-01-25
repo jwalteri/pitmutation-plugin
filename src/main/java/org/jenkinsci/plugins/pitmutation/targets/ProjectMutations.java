@@ -1,91 +1,88 @@
 package org.jenkinsci.plugins.pitmutation.targets;
 
-import com.google.common.collect.Maps;
 import hudson.model.Run;
-import org.jenkinsci.plugins.pitmutation.Mutation;
 import org.jenkinsci.plugins.pitmutation.MutationReport;
 import org.jenkinsci.plugins.pitmutation.PitBuildAction;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Ed Kimber
  */
 public class ProjectMutations extends MutationResult<ProjectMutations> {
-  public ProjectMutations(PitBuildAction action) {
-    super("aggregate", null);
-    action_ = action;
-  }
 
-  @Override
-  public Run<?, ?> getOwner() {
-    return action_.getOwner();
-  }
+    private PitBuildAction action;
 
-  public ProjectMutations getPreviousResult() {
-    PitBuildAction previousAction = action_.getPreviousAction();
-    return previousAction == null ? null : previousAction.getReport();
-  }
-
-  @Override
-  public MutationStats getMutationStats() {
-    return aggregateStats(action_.getReports().values());
-  }
-
-  private static MutationStats aggregateStats(Collection<MutationReport> reports) {
-    MutationStats stats = new MutationStatsImpl("", new ArrayList<Mutation>(0));
-    for (MutationReport report : reports) {
-      stats = stats.aggregate(report.getMutationStats());
+    public ProjectMutations(PitBuildAction action) {
+        super("aggregate", null);
+        this.action = action;
     }
-    return stats;
-  }
 
-  @Override
-  public String getName() {
-    return "Aggregated Reports";
-  }
+    @Override
+    public Run<?, ?> getOwner() {
+        return action.getOwner();
+    }
 
-  public String getDisplayName() {
-    return "Modules";
-  }
+    @Override
+    public ProjectMutations getPreviousResult() {
+        PitBuildAction previousAction = action.getPreviousAction();
+        return previousAction == null ? null : previousAction.getReport();
+    }
 
-  public Map<String, ? extends MutationResult<?>> getChildMap() {
-    return Maps.transformEntries(action_.getReports(), moduleTransformer_);
-  }
+    @Override
+    public MutationStats getMutationStats() {
+        return aggregateStats(action.getReports().values());
+    }
 
-  private Maps.EntryTransformer<String, MutationReport, ModuleResult> moduleTransformer_ =
-    new Maps.EntryTransformer<String, MutationReport, ModuleResult>() {
-      public ModuleResult transformEntry(String moduleName, MutationReport report) {
-        return new ModuleResult(moduleName, ProjectMutations.this, report);
-      }
-    };
+    private static MutationStats aggregateStats(Collection<MutationReport> reports) {
+        MutationStats stats = new MutationStatsImpl("", new ArrayList<>());
+        for (MutationReport report : reports) {
+            stats = stats.aggregate(report.getMutationStats());
+        }
+        return stats;
+    }
 
-  @Override
-  public int compareTo(@Nonnull ProjectMutations other) {
-    return this.getMutationStats().getUndetected() - other.getMutationStats().getUndetected();
-  }
+    @Override
+    public String getName() {
+        return "Aggregated Reports";
+    }
 
-  @Override
-  public boolean equals(Object other) {
-    return other instanceof ProjectMutations
-      && Objects.equals(this.getMutationStats(), ((ProjectMutations) other).getMutationStats())
-      && Objects.equals(this.getChildMap(), ((ProjectMutations) other).getChildMap())
-      && Objects.equals(this.getDisplayName(), ((ProjectMutations) other).getDisplayName())
-      && Objects.equals(this.getUrl(), ((ProjectMutations) other).getUrl())
-      && Objects.equals(this.getSourceFileContent(), ((ProjectMutations) other).getSourceFileContent())
-      && Objects.equals(this.getOwner(), ((ProjectMutations) other).getOwner())
-      && Objects.equals(this.getPreviousResult(), ((ProjectMutations) other).getPreviousResult());
-  }
+    public String getDisplayName() {
+        return "Modules";
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.getMutationStats(), this.getChildMap(), this.getDisplayName(),
-      this.getUrl(), this.getSourceFileContent(), this.getOwner(), this.getPreviousResult());
-  }
+    @Override
+    public Map<String, ? extends MutationResult<?>> getChildMap() {
+        Map<String, ModuleResult> childMap = new HashMap<>();
+        Map<String, MutationReport> reports = action.getReports();
+        for (Map.Entry<String, MutationReport> report : reports.entrySet()) {
+            String reportName = report.getKey();
+            childMap.put(reportName, new ModuleResult(reportName, this, report.getValue()));
+        }
+        return childMap;
+    }
 
-  private PitBuildAction action_;
+    @Override
+    public int compareTo(@Nonnull ProjectMutations other) {
+        return this.getMutationStats().getUndetected() - other.getMutationStats().getUndetected();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof ProjectMutations)) {
+            return false;
+        }
+
+        return Objects.equals(getMutationStats().getUndetected(), ((ProjectMutations) obj).getMutationStats().getUndetected());
+    }
 }

@@ -1,151 +1,30 @@
 package org.jenkinsci.plugins.pitmutation;
 
+import lombok.Data;
+
 /**
  * @author edward
  */
+@Data
 public class Mutation {
+    private boolean detected;
+    private String status;
+    private String sourceFile;
+    private String mutatedClass;
+    private String mutatedMethod;
+    private int lineNumber;
+    private String mutator;
+    private int index;
+    private String killingTest;
+    private String methodDescription;
+    private String description;
+    private String block;
 
-  //TODO better equals
-  public boolean equals(Mutation m) {
-    return m.getMutatedClass().equals(getMutatedClass())
-           && m.getMutatedMethod().equals(getMutatedMethod())
-           && m.getLineNumber() == getLineNumber()
-           && m.getMutator().equals(getMutator())
-           && m.getStatus().equals(getStatus())
-           && m.getIndex() == getIndex();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    return o instanceof Mutation && this.equals((Mutation) o);
-  }
-
-  @Override
-  public int hashCode() {
-    return getMutatedClass() == null ? 1 : getMutatedClass().hashCode() ^ getMutatedClass().hashCode();
-  }
-
-  public boolean isDetected() {
-    return detected_;
-  }
-
-  public void setDetected(final boolean detected) {
-    detected_ = detected;
-  }
-
-  public String getStatus() {
-    return status_;
-  }
-
-  public void setStatus(final String status) {
-    status_ = status;
-  }
-
-  public String getSourceFile() {
-    return file_;
-  }
-
-  public void setSourceFile(final String file) {
-    file_ = file;
-  }
-
-  public String getMutatedClass() {
-    return clsName_;
-  }
-
-  public void setMutatedClass(final String clsName) {
-    clsName_ = clsName;
-  }
-
-  public String getMutatedMethod() {
-    return method_;
-  }
-
-  public void setMutatedMethod(final String method) {
-    method_ = method;
-  }
-
-  public int getLineNumber() {
-    return lineNumber_;
-  }
-
-  public void setLineNumber(final int lineNumber) {
-    lineNumber_ = lineNumber;
-  }
-
-  public String getMutator() {
-    return mutator_;
-  }
-
-  public String getMutatorClass() {
-    int lastDot = mutator_.lastIndexOf('.');
-    String className = mutator_.substring(lastDot + 1);
-    return className.endsWith("Mutator")
+    public String getMutatorClass() {
+        int lastDot = mutator.lastIndexOf('.');
+        String className = mutator.substring(lastDot + 1);
+        return className.endsWith("Mutator")
             ? className.substring(0, className.length() - 7)
             : className;
-  }
-
-  public void setMutator(final String mutator) {
-    mutator_ = mutator;
-  }
-
-  public int getIndex() {
-    return index_;
-  }
-
-  public void setIndex(final int index) {
-    index_ = index;
-  }
-
-  public String getKillingTest() {
-    return killedTest_;
-  }
-
-  public void setKillingTest(final String killedTest) {
-    killedTest_ = killedTest;
-  }
-
-  public void setMethodDescription(final String methodDescription) {
-    methodDescription_ = methodDescription;
-  }
-
-  public String getMethodDescription() {
-    return methodDescription_;
-  }
-
-  public void setDescription(final String description) {
-	  description_ = description;
-  }
-
-  public String getDescription() {
-    return description_;
-  }
-
-  public String toString() {
-    return file_ + ":" + lineNumber_ + " : " + status_ + " type:[" + mutator_ +"]";
-  }
-
-  enum Status {
-    KILLED,
-    NO_COVERAGE
-  }
-
-  public void setBlock(@SuppressWarnings("unused") String ignored) {
-  }
-
-  public String getBlock() {
-    return null;
-  }
-
-  private boolean detected_;
-  private String status_;
-  private String file_;
-  private String clsName_;
-  private String method_;
-  private int lineNumber_;
-  private String mutator_;
-  private int index_;
-  private String killedTest_;
-  private String methodDescription_;
-  private String description_;
+    }
 }
