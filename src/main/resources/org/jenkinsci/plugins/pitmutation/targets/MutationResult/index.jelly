@@ -79,7 +79,7 @@
 
             <j:if test="${it.sourceLevel}">
             <h1>Source</h1>
-            ${it.sourceFileContent}
+            <j:out value="${it.sourceFileContent}" />
             </j:if>
         </l:main-panel>
     </l:layout>
