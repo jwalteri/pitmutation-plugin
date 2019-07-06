@@ -1,66 +1,71 @@
 package org.jenkinsci.plugins.pitmutation.targets;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
+import lombok.extern.slf4j.Slf4j;
 import org.jenkinsci.plugins.pitmutation.Mutation;
 
 import javax.annotation.Nonnull;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author Ed Kimber
  */
+@Slf4j
 public class MutatedPackage extends MutationResult<MutatedPackage> {
 
-  public MutatedPackage(String name, MutationResult parent, Multimap<String, Mutation> classMutations) {
-    super(name, parent);
-    classMutations_ = classMutations;
-  }
+    private Map<String, List<Mutation>> classMutations;
 
-  @Override
-  public String getDisplayName() {
-    return "Package: " + getName();
-  }
+    public MutatedPackage(String name, MutationResult parent, Map<String, List<Mutation>> classMutations) {
+        super(name, parent);
+        this.classMutations = classMutations;
+    }
 
-  @Override
-  public MutationStats getMutationStats() {
-    return new MutationStatsImpl(getName(), classMutations_.values());
-  }
+    @Override
+    public String getDisplayName() {
+        return "Package: " + getName();
+    }
 
-  @Override
-  public Map<String, ? extends MutationResult<?>> getChildMap() {
-    return Maps.transformEntries(classMutations_.asMap(), classTransformer_);
-  }
+    @Override
+    public MutationStats getMutationStats() {
+        return new MutationStatsImpl(getName(), classMutations.values().stream().flatMap(List::stream).collect(toList()));
+    }
 
-  private Maps.EntryTransformer<String, Collection<Mutation>, MutatedClass> classTransformer_ =
-    new Maps.EntryTransformer<String, Collection<Mutation>, MutatedClass>() {
-      public MutatedClass transformEntry(String name, Collection<Mutation> mutations) {
-        logger_.log(Level.FINER, "found " + mutations.size() + " reports for " + name);
-        return new MutatedClass(name, MutatedPackage.this, mutations);
-      }
-    };
+    @Override
+    public Map<String, MutatedClass> getChildMap() {
+        Map<String, MutatedClass> childMap = new HashMap<>();
+        for (Map.Entry<String, List<Mutation>> classMutation : classMutations.entrySet()) {
+            String className = classMutation.getKey();
+            List<Mutation> mutations = classMutation.getValue();
+            log.debug("found " + mutations.size() + " reports for " + className);
+            childMap.put(className, new MutatedClass(className, this, mutations));
+        }
+        return childMap;
+    }
 
+    @Override
+    public int compareTo(@Nonnull MutatedPackage other) {
+        return this.getMutationStats().getUndetected() - other.getMutationStats().getUndetected();
+    }
 
-  private Multimap<String, Mutation> classMutations_;
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this);
+    }
 
-  @Override
-  public int compareTo(@Nonnull MutatedPackage other) {
-    return this.getMutationStats().getUndetected() - other.getMutationStats().getUndetected();
-  }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
 
-  @Override
-  public boolean equals(Object other) {
-    return other instanceof MutatedPackage
-      && Objects.equals(this.getMutationStats(), ((MutatedPackage) other).getMutationStats())
-      && Objects.equals(this.getChildMap(), ((MutatedPackage) other).getChildMap())
-      && Objects.equals(this.getDisplayName(), ((MutatedPackage) other).getDisplayName());
-  }
+        if (!(obj instanceof MutatedPackage)) {
+            return false;
+        }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.getMutationStats(), this.getChildMap(), this.getDisplayName());
-  }
+        return Objects.equals(getMutationStats().getUndetected(), ((MutatedPackage) obj).getMutationStats().getUndetected());
+    }
 }

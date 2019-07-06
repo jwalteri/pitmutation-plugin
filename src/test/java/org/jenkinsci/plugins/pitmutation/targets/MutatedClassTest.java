@@ -1,11 +1,14 @@
 package org.jenkinsci.plugins.pitmutation.targets;
 
-import org.jenkinsci.plugins.pitmutation.Mutation;
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 /**
  * User: Ed Kimber
@@ -14,16 +17,25 @@ import java.util.Collection;
  */
 public class MutatedClassTest extends MutationResultTest {
 
-  @Before
-  public void setup() {
-    Collection<Mutation> mutations = new ArrayList<Mutation>();
-    mutatedClass_ = new MutatedClass("TestClass", null, mutations);
-  }
+    private MutatedClass mutatedClass;
 
-  @Test
-  public void lineUrlsAreSet() {
+    @Before
+    public void setUp() throws IOException, SAXException {
+        super.setUp();
+        mutatedClass = new MutatedClass("TestClass", null, new ArrayList<>());
+    }
 
-  }
+    @Test
+    public void isSourceLevelReturnsTrue() {
+        assertThat(mutatedClass.isSourceLevel(), is(true));
+    }
 
-  private MutatedClass mutatedClass_;
+    @Test
+    public void getDisplayNameReturnsName() {
+        assertThat(mutatedClass.getDisplayName(), is("Class: TestClass"));
+    }
+
+    @Test
+    public void lineUrlsAreSet() {
+    }
 }

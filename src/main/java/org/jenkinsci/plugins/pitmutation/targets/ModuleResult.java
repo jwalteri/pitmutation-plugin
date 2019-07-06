@@ -1,107 +1,76 @@
 package org.jenkinsci.plugins.pitmutation.targets;
 
-import com.google.common.collect.MapDifference;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimaps;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jenkinsci.plugins.pitmutation.Mutation;
 import org.jenkinsci.plugins.pitmutation.MutationReport;
 
 import javax.annotation.Nonnull;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * @author edward
  */
+@Slf4j
 public class ModuleResult extends MutationResult<ModuleResult> {
 
-  public ModuleResult(String name, MutationResult parent, MutationReport report) {
-    super(name, parent);
-    name_ = name;
-    report_ = report;
-  }
+    private MutationReport report;
+    @Getter
+    private String name;
 
-  public String getDisplayName() {
-    return "Module: " + getName();
-  }
+    public ModuleResult(String name, MutationResult parent, MutationReport report) {
+        super(name, parent);
+        this.name = name;
+        this.report = report;
+    }
 
-  @Override
-  public MutationStats getMutationStats() {
-    return report_.getMutationStats();
-  }
+    @Override
+    public String getDisplayName() {
+        return "Module: " + getName();
+    }
 
-  public Map<String, MutatedPackage> getChildMap() {
-    return Maps.transformEntries(report_.getMutationsByPackage().asMap(), packageTransformer_);
-  }
+    @Override
+    public MutationStats getMutationStats() {
+        return report.getMutationStats();
+    }
 
-//  public Collection<MutationStats> getStatsForNewTargets() {
-//    return Maps.transformEntries(
-//            Maps.difference(
-//                    reports_.getFirst().getMutationsByClass().asMap(),
-//                    reports_.getSecond().getMutationsByClass().asMap())
-//                    .entriesOnlyOnLeft(),
-//            statsTransformer_).values();
-//  }
+    @Override
+    public Map<String, MutatedPackage> getChildMap() {
+        Map<String, MutatedPackage> childMap = new HashMap<>();
+        for (String packageName : report.getMutationsByPackage().keySet()) {
+            Map<String, List<Mutation>> classMutations =
+                report.getMutationsForPackage(packageName).stream().collect(groupingBy(Mutation::getMutatedClass));
 
-//  public Collection<Pair<MutatedClass>> getClassesWithNewSurvivors() {
-//    return Maps.transformEntries(mutationDifference_, classMutationDifferenceTransform_).values();
-//  }
+            childMap.put(packageName, new MutatedPackage(packageName, this, classMutations));
+        }
+        return childMap;
+    }
 
-  public String getName() {
-    return name_;
-  }
+    @Override
+    public int compareTo(@Nonnull ModuleResult other) {
+        return this.getMutationStats().getUndetected() - other.getMutationStats().getUndetected();
+    }
 
-  private Maps.EntryTransformer<String, Collection<Mutation>, MutatedPackage> packageTransformer_ =
-    new Maps.EntryTransformer<String, Collection<Mutation>, MutatedPackage>() {
-      public MutatedPackage transformEntry(String name, Collection<Mutation> mutations) {
-        logger.log(Level.FINER, "found " + report_.getMutationsForPackage(name).size() + " reports for " + name);
-        return new MutatedPackage(name, ModuleResult.this, Multimaps.index(report_.getMutationsForPackage(name), MutationReport.classIndexFunction));
-      }
-    };
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this);
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
 
-  private static final Maps.EntryTransformer<String, Collection<Mutation>, MutationStats> statsTransformer_ =
-    new Maps.EntryTransformer<String, Collection<Mutation>, MutationStats>() {
-      public MutationStats transformEntry(String name, Collection<Mutation> mutations) {
-        return new MutationStatsImpl(name, mutations);
-      }
-    };
+        if (!(obj instanceof ModuleResult)) {
+            return false;
+        }
 
-
-//  private Maps.EntryTransformer<String, MapDifference.ValueDifference<Collection<Mutation>>, Pair<MutatedClass>> classMutationDifferenceTransform_ =
-//          new Maps.EntryTransformer<String, MapDifference.ValueDifference<Collection<Mutation>>, Pair<MutatedClass>>() {
-//            public Pair<MutatedClass> transformEntry(String name, MapDifference.ValueDifference<Collection<Mutation>> value) {
-////              return MutatedClass.createPair(name, getOwner(), value.leftValue(), value.rightValue());
-//            }
-//          };
-
-  @Override
-  public int compareTo(@Nonnull ModuleResult other) {
-    return this.getMutationStats().getUndetected() - other.getMutationStats().getUndetected();
-  }
-
-  @Override
-  public boolean equals(Object other) {
-    return other instanceof ModuleResult
-      && Objects.equals(this.getMutationStats(), ((ModuleResult) other).getMutationStats())
-      && Objects.equals(this.getChildMap(), ((ModuleResult) other).getChildMap())
-      && Objects.equals(this.getDisplayName(), ((ModuleResult) other).getDisplayName())
-      && Objects.equals(this.getUrl(), ((ModuleResult) other).getUrl())
-      && Objects.equals(this.getSourceFileContent(), ((ModuleResult) other).getSourceFileContent());
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.getMutationStats(), this.getChildMap(), this.getDisplayName(),
-      this.getUrl(), this.getSourceFileContent());
-  }
-
-  private static final Logger logger = Logger.getLogger(ModuleResult.class.getName());
-
-  private Map<String, MapDifference.ValueDifference<Collection<Mutation>>> mutationDifference_;
-  private MutationReport report_;
-  private String name_;
+        return Objects.equals(getMutationStats().getUndetected(), ((ModuleResult) obj).getMutationStats().getUndetected());
+    }
 }
