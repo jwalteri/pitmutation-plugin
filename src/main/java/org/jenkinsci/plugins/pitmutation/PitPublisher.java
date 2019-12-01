@@ -148,7 +148,12 @@ public class PitPublisher extends Recorder implements SimpleBuildStep {
             if (StringUtils.isBlank(base)) {
                 moduleName = String.valueOf(i == 0 ? null : i);
             } else {
-                moduleName = report.getRemote().replace(base, "").split("/")[1];
+                String[] partsFromRemoteWithoutBase = report.getRemote().replace(base, "").split("[/\\\\]");
+                if (partsFromRemoteWithoutBase.length > 1) {
+                    moduleName = partsFromRemoteWithoutBase[1];
+                } else {
+                    moduleName = String.valueOf(i == 0 ? null : i);
+                }
             }
 
             final FilePath targetPath = new FilePath(buildTarget, "mutation-report-" + moduleName);

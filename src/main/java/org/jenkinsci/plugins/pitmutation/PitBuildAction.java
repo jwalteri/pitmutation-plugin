@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 @Slf4j
 public class PitBuildAction implements HealthReportingAction, StaplerProxy {
 
-    private static final Pattern MUTATION_REPORT_PATTERN = Pattern.compile(".*mutation-report-([^/]*).*");
+    private static final Pattern MUTATION_REPORT_PATTERN = Pattern.compile(".*mutation-report-([^/\\\\]*).*");
 
     @Getter
     private Run<?, ?> owner;
