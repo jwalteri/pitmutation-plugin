@@ -59,11 +59,11 @@ public class MutatedClass extends MutationResult<MutatedClass> {
 
     @Override
     public String getSourceFileContent() {
+        String sourceFilePath = getOwner().getRootDir() + File.separator + "mutation-report-" + getParent().getParent().getName() + File.separator + package_ + File.separator + fileName;
         try {
-            return new TextFile(new File(getOwner().getRootDir(), "mutation-report-" + getParent().getParent().getName() + "/" + package_ + File.separator + fileName)).read();
+            return new TextFile(new File(sourceFilePath)).read();
         } catch (IOException exception) {
-            return "Could not read source file: " + getOwner().getRootDir().getPath()
-                + "/mutation-report/" + package_ + File.separator + fileName + "\n";
+            return "Could not read source file: " + sourceFilePath + "\n";
         }
     }
 
