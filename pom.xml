@@ -1,15 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <version>3.50</version>
-        <relativePath/>
+        <relativePath />
     </parent>
 
     <artifactId>pitmutation</artifactId>
-    <version>1.0-18-SNAPSHOT</version>
+    <version>1.0-18</version>
     <name>Jenkins PIT Mutation Plugin</name>
     <packaging>hpi</packaging>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/pitmutation</url>
@@ -18,7 +17,8 @@
         <connection>scm:git:ssh://git@github.com/jenkinsci/pitmutation-plugin.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jenkinsci/pitmutation-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/pitmutation-plugin</url>
-    </scm>
+      <tag>pitmutation-1.0-18</tag>
+  </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -144,7 +144,7 @@
                             <exclude>org.jenkinsci.plugins.pitmutation.Messages</exclude>
                         </excludes>
                     </instrumentation>
-                    <check/>
+                    <check />
                 </configuration>
             </plugin>
             <plugin>
