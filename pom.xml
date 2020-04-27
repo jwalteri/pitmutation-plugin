@@ -1,10 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <version>3.50</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <artifactId>pitmutation</artifactId>
@@ -17,8 +18,8 @@
         <connection>scm:git:ssh://git@github.com/jenkinsci/pitmutation-plugin.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jenkinsci/pitmutation-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/pitmutation-plugin</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -97,6 +98,12 @@
             <artifactId>junit</artifactId>
             <version>4.13</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -144,7 +151,7 @@
                             <exclude>org.jenkinsci.plugins.pitmutation.Messages</exclude>
                         </excludes>
                     </instrumentation>
-                    <check />
+                    <check/>
                 </configuration>
             </plugin>
             <plugin>
