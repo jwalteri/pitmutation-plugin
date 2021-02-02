@@ -116,7 +116,7 @@ public class PitPublisher extends Recorder implements SimpleBuildStep {
 
             ParseReportCallable fileCallable = new ParseReportCallable(mutationStatsFile);
             FilePath[] reports = workspace.act(fileCallable);
-            publishReports(reports, new FilePath(build.getRootDir()), null);
+            publishReports(reports, new FilePath(build.getRootDir()), workspace.getRemote());
 
             PitBuildAction action = new PitBuildAction(build);
             build.addAction(action);

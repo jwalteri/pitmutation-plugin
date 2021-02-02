@@ -36,7 +36,7 @@ public class MutationReport {
 
         MutationReport report = digester.parse(input);
         report.mutationsByClass.forEach((className, mutations) ->
-            report.mutationsByPackage.computeIfAbsent(className, k -> new ArrayList<>()).addAll(mutations));
+            report.mutationsByPackage.computeIfAbsent(packageNameFromClass(className), k -> new ArrayList<>()).addAll(mutations));
         return report;
     }
 

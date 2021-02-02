@@ -53,7 +53,7 @@ public class MutatedPackage extends MutationResult<MutatedPackage> {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this);
+        return Objects.hash(this.getMutationStats(), this.getChildMap(), this.getDisplayName());
     }
 
     @Override

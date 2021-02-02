@@ -44,7 +44,7 @@ public class ModuleResult extends MutationResult<ModuleResult> {
         Map<String, MutatedPackage> childMap = new HashMap<>();
         for (String packageName : report.getMutationsByPackage().keySet()) {
             Map<String, List<Mutation>> classMutations =
-                report.getMutationsForPackage(packageName).stream().collect(groupingBy(Mutation::getMutatedClass));
+                report.getMutationsForPackage(packageName).stream().collect(groupingBy(this::getClassName));
 
             childMap.put(packageName, new MutatedPackage(packageName, this, classMutations));
         }
@@ -58,7 +58,8 @@ public class ModuleResult extends MutationResult<ModuleResult> {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this);
+        return Objects.hash(this.getMutationStats(), this.getChildMap(), this.getDisplayName(),
+            this.getUrl(), this.getSourceFileContent());
     }
 
     @Override
@@ -72,5 +73,14 @@ public class ModuleResult extends MutationResult<ModuleResult> {
         }
 
         return Objects.equals(getMutationStats().getUndetected(), ((ModuleResult) obj).getMutationStats().getUndetected());
+    }
+
+    private String getClassName(Mutation mutation)
+    {
+        String mutatedClassName = mutation.getMutatedClass();
+        int firstDollar = mutatedClassName.indexOf('$');
+        return firstDollar >= 0
+            ? mutatedClassName.substring(0, firstDollar)
+            : mutatedClassName;
     }
 }

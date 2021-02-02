@@ -70,7 +70,8 @@ public class ProjectMutations extends MutationResult<ProjectMutations> {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this);
+        return Objects.hash(this.getMutationStats(), this.getChildMap(), this.getDisplayName(),
+            this.getUrl(), this.getSourceFileContent(), this.getOwner(), this.getPreviousResult());
     }
 
     @Override

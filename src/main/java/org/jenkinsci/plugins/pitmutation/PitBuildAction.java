@@ -135,7 +135,7 @@ public class PitBuildAction implements HealthReportingAction, StaplerProxy {
 
     @Override
     public String getIconFileName() {
-        return "/plugin/pitmutation/donatello.png";
+        return "/plugin/pitmutation/pitest.png";
     }
 
     @Override

@@ -55,7 +55,7 @@ public class PitProjectAction extends Actionable implements ProminentProjectActi
 
     @Override
     public String getIconFileName() {
-        return "/plugin/pitmutation/donatello.png";
+        return "/plugin/pitmutation/pitest.png";
     }
 
     @Override

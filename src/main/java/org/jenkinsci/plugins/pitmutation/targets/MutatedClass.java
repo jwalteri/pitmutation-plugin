@@ -34,11 +34,8 @@ public class MutatedClass extends MutationResult<MutatedClass> {
         this.mutations = mutations;
 
         int lastDot = name.lastIndexOf('.');
-        int firstDollar = name.indexOf('$');
         package_ = lastDot >= 0 ? name.substring(0, lastDot) : "";
-        fileName = firstDollar >= 0
-            ? lastDot >= 0 ? name.substring(lastDot + 1, firstDollar) + ".java.html" : ""
-            : lastDot >= 0 ? name.substring(lastDot + 1) + ".java.html" : "";
+        fileName = lastDot >= 0 ? name.substring(lastDot + 1) + ".java.html" : "";
 
         mutatedLines = createMutatedLines(mutations);
     }
@@ -88,7 +85,8 @@ public class MutatedClass extends MutationResult<MutatedClass> {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this);
+        return Objects.hash(this.getMutationStats(), this.getChildMap(), this.getDisplayName(),
+            this.getFileName(), this.getUrl(), this.getSourceFileContent());
     }
 
     @Override

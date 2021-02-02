@@ -68,7 +68,8 @@ public class MutatedLine extends MutationResult<MutatedLine> {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this);
+        return Objects.hash(this.getMutationStats(), this.getChildMap(), this.getDisplayName(),
+            this.getMutators(), this.getUrl());
     }
 
     @Override
