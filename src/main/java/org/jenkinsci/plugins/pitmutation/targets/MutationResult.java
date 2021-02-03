@@ -72,6 +72,10 @@ public abstract class MutationResult<T extends MutationResult> implements Compar
         return "";
     }
 
+    public String getStyleSheetContent() {
+        return "";
+    }
+
     public boolean isCoverageAltered() {
         return false;
     }

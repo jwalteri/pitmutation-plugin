@@ -1,25 +1,26 @@
 package org.jenkinsci.plugins.pitmutation.targets;
 
-import hudson.util.TextFile;
-import lombok.Getter;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 
-import org.jenkinsci.plugins.pitmutation.Mutation;
-
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
+import org.jenkinsci.plugins.pitmutation.Mutation;
+
+import hudson.util.TextFile;
+import lombok.Getter;
 
 /**
  * @author Ed Kimber
  */
 public class MutatedClass extends MutationResult<MutatedClass>
 {
+    private static final String END_HEADER_TAG = "</h1>";
 
     @Getter
     private String name;
@@ -59,23 +60,43 @@ public class MutatedClass extends MutationResult<MutatedClass>
         return true;
     }
 
+    /**
+     * Gets the contents of the coverage report for the file, but removes the header and the stylesheet as this needs to be handled separately in jelly.
+     * @return The source of the coverage report to show in the UI
+     */
     @Override
     public String getSourceFileContent()
     {
-        String sourceFilePath =
+        String fullContents = getFileContents(package_ + File.separator + fileName);
+        return fullContents.contains(END_HEADER_TAG) ? fullContents.substring(fullContents.indexOf(END_HEADER_TAG) + 5) :
+            fullContents;
+    }
+
+    /**
+     * Gets the contents of the style sheet for the coverage report.
+     * @return The source of the coverage report to show in the UI.
+     */
+    @Override
+    public String getStyleSheetContent()
+    {
+        return getFileContents("style.css");
+    }
+
+    private String getFileContents(String path)
+    {
+        String filePath =
             getOwner().getRootDir() + File.separator + "mutation-report-" + getParent().getParent().getName() +
-                File.separator + package_ + File.separator + fileName;
+                File.separator + path;
         try
         {
-            String fullContents = new TextFile(new File(sourceFilePath)).read();
-            return fullContents.contains("</h1>") ? fullContents.substring(fullContents.indexOf("</h1>") + 5) :
-                fullContents;
+            return new TextFile(new File(filePath)).read();
         }
         catch (IOException exception)
         {
-            return "Could not read source file: " + sourceFilePath + "\n";
+            return "Could not read file: " + filePath + "\n";
         }
     }
+
 
     public String getDisplayName()
     {
