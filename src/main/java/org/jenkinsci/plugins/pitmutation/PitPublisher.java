@@ -170,24 +170,6 @@ public class PitPublisher extends Recorder implements SimpleBuildStep {
     }
 
     /**
-     * Mutations report exists boolean.
-     *
-     * @param reportDir the report dir
-     * @return the boolean
-     */
-    boolean mutationsReportExists(FilePath reportDir) {
-        if (reportDir == null) {
-            return false;
-        }
-        try {
-            FilePath[] search = reportDir.list("**/mutations.xml");
-            return search.length > 0;
-        } catch (IOException | InterruptedException e) {
-            return false;
-        }
-    }
-
-    /**
      * Decide build result result.
      *
      * @param action the action
@@ -285,15 +267,6 @@ public class PitPublisher extends Recorder implements SimpleBuildStep {
         return BuildStepMonitor.BUILD;
     }
 
-    private FilePath getReportDir(FilePath root) throws IOException, InterruptedException {
-        FilePath reportsDir = new FilePath(root, mutationStatsFile);
-        if (reportsDir.isDirectory()) {
-            return reportsDir;
-        } else {
-            return reportsDir.getParent();
-        }
-    }
-
     /**
      * The type Descriptor.
      */
@@ -327,18 +300,6 @@ public class PitPublisher extends Recorder implements SimpleBuildStep {
             save();
             return super.configure(req, formData);
         }
-
-//        /**
-//         * Creates a new instance of {@link PitPublisher} from a submitted form.
-//         */
-//        @Override
-//        public PitPublisher newInstance(@Nullable StaplerRequest req, @Nonnull JSONObject formData) {
-//            if (req == null) {
-//                throw new IllegalArgumentException("");
-//            }
-//            super.newInstance(req, formData);
-//            return req.bindJSON(PitPublisher.class, formData);
-//        }
     }
 
     /**

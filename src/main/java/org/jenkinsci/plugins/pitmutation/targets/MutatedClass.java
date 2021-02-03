@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.pitmutation.targets;
 
 import hudson.util.TextFile;
 import lombok.Getter;
+
 import org.jenkinsci.plugins.pitmutation.Mutation;
 
 import javax.annotation.Nonnull;
@@ -17,7 +18,8 @@ import static java.util.stream.Collectors.toMap;
 /**
  * @author Ed Kimber
  */
-public class MutatedClass extends MutationResult<MutatedClass> {
+public class MutatedClass extends MutationResult<MutatedClass>
+{
 
     @Getter
     private String name;
@@ -28,7 +30,8 @@ public class MutatedClass extends MutationResult<MutatedClass> {
     private Collection<Mutation> mutations;
     private Map<String, MutatedLine> mutatedLines;
 
-    public MutatedClass(String name, MutationResult parent, Collection<Mutation> mutations) {
+    public MutatedClass(String name, MutationResult parent, Collection<Mutation> mutations)
+    {
         super(name, parent);
         this.name = name;
         this.mutations = mutations;
@@ -40,7 +43,8 @@ public class MutatedClass extends MutationResult<MutatedClass> {
         mutatedLines = createMutatedLines(mutations);
     }
 
-    private Map<String, MutatedLine> createMutatedLines(Collection<Mutation> mutations) {
+    private Map<String, MutatedLine> createMutatedLines(Collection<Mutation> mutations)
+    {
         return mutations.stream()
             .collect(groupingBy(Mutation::getLineNumber))
             .values()
@@ -50,55 +54,70 @@ public class MutatedClass extends MutationResult<MutatedClass> {
     }
 
     @Override
-    public boolean isSourceLevel() {
+    public boolean isSourceLevel()
+    {
         return true;
     }
 
     @Override
-    public String getSourceFileContent() {
-        String sourceFilePath = getOwner().getRootDir() + File.separator + "mutation-report-" + getParent().getParent().getName() + File.separator + package_ + File.separator + fileName;
-        try {
-            return new TextFile(new File(sourceFilePath)).read();
-        } catch (IOException exception) {
+    public String getSourceFileContent()
+    {
+        String sourceFilePath =
+            getOwner().getRootDir() + File.separator + "mutation-report-" + getParent().getParent().getName() +
+                File.separator + package_ + File.separator + fileName;
+        try
+        {
+            String fullContents = new TextFile(new File(sourceFilePath)).read();
+            return fullContents.contains("</h1>") ? fullContents.substring(fullContents.indexOf("</h1>") + 5) :
+                fullContents;
+        }
+        catch (IOException exception)
+        {
             return "Could not read source file: " + sourceFilePath + "\n";
         }
     }
 
-    public String getDisplayName() {
+    public String getDisplayName()
+    {
         return "Class: " + name;
     }
 
     @Override
-    public MutationStats getMutationStats() {
+    public MutationStats getMutationStats()
+    {
         return new MutationStatsImpl(getName(), mutations);
     }
 
     @Override
-    public Map<String, ? extends MutationResult<?>> getChildMap() {
+    public Map<String, ? extends MutationResult<?>> getChildMap()
+    {
         return mutatedLines;
     }
 
     @Override
-    public int compareTo(@Nonnull MutatedClass other) {
+    public int compareTo(@Nonnull MutatedClass other)
+    {
         return this.getMutationStats().getUndetected() - other.getMutationStats().getUndetected();
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(this.getMutationStats(), this.getChildMap(), this.getDisplayName(),
-            this.getFileName(), this.getUrl(), this.getSourceFileContent());
+    public boolean equals(Object o)
+    {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        MutatedClass that = (MutatedClass) o;
+        return Objects.equals(name, that.name) &&
+            Objects.equals(package_, that.package_) &&
+            Objects.equals(fileName, that.fileName) &&
+            Objects.equals(mutations, that.mutations) &&
+            Objects.equals(mutatedLines, that.mutatedLines);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof MutatedClass)) {
-            return false;
-        }
-
-        return Objects.equals(getMutationStats().getUndetected(), ((MutatedClass) obj).getMutationStats().getUndetected());
+    public int hashCode()
+    {
+        return Objects.hash(name, package_, fileName, mutations, mutatedLines);
     }
 }

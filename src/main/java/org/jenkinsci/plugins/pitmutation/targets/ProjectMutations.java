@@ -69,21 +69,19 @@ public class ProjectMutations extends MutationResult<ProjectMutations> {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(this.getMutationStats(), this.getChildMap(), this.getDisplayName(),
-            this.getUrl(), this.getSourceFileContent(), this.getOwner(), this.getPreviousResult());
+    public boolean equals(Object o)
+    {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ProjectMutations that = (ProjectMutations) o;
+        return Objects.equals(action, that.action);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof ProjectMutations)) {
-            return false;
-        }
-
-        return Objects.equals(getMutationStats().getUndetected(), ((ProjectMutations) obj).getMutationStats().getUndetected());
+    public int hashCode()
+    {
+        return Objects.hash(action);
     }
 }

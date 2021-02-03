@@ -67,21 +67,20 @@ public class MutatedLine extends MutationResult<MutatedLine> {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(this.getMutationStats(), this.getChildMap(), this.getDisplayName(),
-            this.getMutators(), this.getUrl());
+    public boolean equals(Object o)
+    {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        MutatedLine that = (MutatedLine) o;
+        return lineNumber == that.lineNumber &&
+            Objects.equals(mutations, that.mutations);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof MutatedLine)) {
-            return false;
-        }
-
-        return Objects.equals(getMutationStats().getUndetected(), ((MutatedLine) obj).getMutationStats().getUndetected());
+    public int hashCode()
+    {
+        return Objects.hash(lineNumber, mutations);
     }
 }

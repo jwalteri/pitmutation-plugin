@@ -57,22 +57,21 @@ public class ModuleResult extends MutationResult<ModuleResult> {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(this.getMutationStats(), this.getChildMap(), this.getDisplayName(),
-            this.getUrl(), this.getSourceFileContent());
+    public boolean equals(Object o)
+    {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ModuleResult that = (ModuleResult) o;
+        return Objects.equals(report, that.report) &&
+            Objects.equals(name, that.name);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof ModuleResult)) {
-            return false;
-        }
-
-        return Objects.equals(getMutationStats().getUndetected(), ((ModuleResult) obj).getMutationStats().getUndetected());
+    public int hashCode()
+    {
+        return Objects.hash(report, name);
     }
 
     private String getClassName(Mutation mutation)
