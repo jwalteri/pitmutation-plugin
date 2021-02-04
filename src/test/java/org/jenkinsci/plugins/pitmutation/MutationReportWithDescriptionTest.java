@@ -1,52 +1,58 @@
 package org.jenkinsci.plugins.pitmutation;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.xml.sax.SAXException;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.Is.is;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
 /**
  * @author edward
  */
-public class MutationReportWithDescriptionTest {
+public class MutationReportWithDescriptionTest
+{
 
     private InputStream mutationsXml;
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         mutationsXml = getClass().getResourceAsStream("testmutations-02.xml");
     }
 
     @Test
-    public void packageNameFinder() {
+    public void packageNameFinder()
+    {
         assertThat(MutationReport.packageNameFromClass("xxx.yyy.zzz.Foo"), is("xxx.yyy.zzz"));
         assertThat(MutationReport.packageNameFromClass("Foo"), is(""));
     }
 
     @Test
-    public void countsKills() throws IOException, SAXException {
+    public void countsKills() throws IOException, SAXException
+    {
         MutationReport report = MutationReport.create(mutationsXml);
         assertThat(report.getMutationStats().getKillCount(), is(3));
         assertThat(report.getMutationStats().getTotalMutations(), is(4));
     }
 
     @Test
-    public void sortsMutationsByClassName() throws IOException, SAXException {
+    public void sortsMutationsByClassName() throws IOException, SAXException
+    {
         MutationReport report = MutationReport.create(mutationsXml);
         Collection<Mutation> mutations = report.getMutationsForClassName("es.rodri.controllers.CompositorController");
         assertThat(mutations.size(), is(4));
     }
 
     @Test
-    public void indexesMutationsByPackage() throws IOException, SAXException {
+    public void indexesMutationsByPackage() throws IOException, SAXException
+    {
         MutationReport report = MutationReport.create(mutationsXml);
         assertThat(report.getMutationsForPackage("es.rodri.controllers"), hasSize(4));
         assertThat(report.getMutationsForPackage(""), notNullValue());
