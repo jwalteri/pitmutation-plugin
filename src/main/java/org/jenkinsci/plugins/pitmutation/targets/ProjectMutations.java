@@ -69,8 +69,7 @@ public class ProjectMutations extends MutationResult<ProjectMutations> {
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -80,8 +79,7 @@ public class ProjectMutations extends MutationResult<ProjectMutations> {
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(action);
     }
 }

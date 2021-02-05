@@ -11,26 +11,22 @@ import java.util.*;
 /**
  * @author edward
  */
-public class MutationReport
-{
+public class MutationReport {
 
     private final Map<String, List<Mutation>> mutationsByPackage;
     private final Map<String, List<Mutation>> mutationsByClass;
     private int killCount = 0;
 
-    public MutationReport()
-    {
+    public MutationReport() {
         this.mutationsByClass = new HashMap<>();
         this.mutationsByPackage = new HashMap<>();
     }
 
-    public static MutationReport create(InputStream xmlReport) throws IOException, SAXException
-    {
+    public static MutationReport create(InputStream xmlReport) throws IOException, SAXException {
         return digestMutations(xmlReport);
     }
 
-    private static MutationReport digestMutations(InputStream input) throws IOException, SAXException
-    {
+    private static MutationReport digestMutations(InputStream input) throws IOException, SAXException {
         Digester digester = new Digester();
         digester.addObjectCreate("mutations", MutationReport.class);
         digester.addObjectCreate("mutations/mutation", Mutation.class);
@@ -39,8 +35,7 @@ public class MutationReport
         digester.addSetNestedProperties("mutations/mutation");
 
         MutationReport report = digester.parse(input);
-        report.mutationsByClass.forEach((className, mutations) ->
-        {
+        report.mutationsByClass.forEach((className, mutations) -> {
             String packageName = packageNameFromClass(className);
             List<Mutation> existingPackageMutations = report.mutationsByPackage
                 .computeIfAbsent(packageName, k -> new ArrayList<>());
@@ -55,60 +50,49 @@ public class MutationReport
      *
      * @param mutation {@link Mutation} to add
      */
-    public void addMutation(Mutation mutation)
-    {
+    public void addMutation(Mutation mutation) {
         mutationsByClass.computeIfAbsent(mutation.getMutatedClass(), k -> new ArrayList<>())
             .add(mutation);
-        if (mutation.isDetected())
-        {
+        if (mutation.isDetected()) {
             killCount++;
         }
         mutationsByPackage.computeIfAbsent(packageNameFromClass(mutation.getMutatedClass()), k -> new ArrayList<>())
             .add(mutation);
     }
 
-    public Collection<Mutation> getMutationsForPackage(String packageName)
-    {
+    public Collection<Mutation> getMutationsForPackage(String packageName) {
         return mutationsByPackage.computeIfAbsent(packageName, k -> new ArrayList<>());
     }
 
-    public Map<String, List<Mutation>> getMutationsByPackage()
-    {
+    public Map<String, List<Mutation>> getMutationsByPackage() {
         return mutationsByPackage;
     }
 
-    public Collection<Mutation> getMutationsForClassName(String className)
-    {
+    public Collection<Mutation> getMutationsForClassName(String className) {
         return mutationsByClass.computeIfAbsent(className, k -> new ArrayList<>());
     }
 
-    public MutationStats getMutationStats()
-    {
-        return new MutationStats()
-        {
+    public MutationStats getMutationStats() {
+        return new MutationStats() {
             @Override
-            public String getTitle()
-            {
+            public String getTitle() {
                 return "Report Stats";
             }
 
             @Override
-            public int getUndetected()
-            {
+            public int getUndetected() {
                 return getTotalMutations() - killCount;
             }
 
             @Override
-            public int getTotalMutations()
-            {
+            public int getTotalMutations() {
                 return mutationsByClass.values().stream().mapToInt(Collection::size).sum();
             }
         };
     }
 
     // TODO: Move somewhere out of this class
-    static String packageNameFromClass(String fqcn)
-    {
+    static String packageNameFromClass(String fqcn) {
         int idx = fqcn.lastIndexOf('.');
         return fqcn.substring(0, idx != -1 ? idx : 0);
     }

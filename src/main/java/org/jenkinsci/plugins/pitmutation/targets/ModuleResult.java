@@ -51,14 +51,21 @@ public class ModuleResult extends MutationResult<ModuleResult> {
         return childMap;
     }
 
+    private String getClassName(Mutation mutation) {
+        String mutatedClassName = mutation.getMutatedClass();
+        int firstDollar = mutatedClassName.indexOf('$');
+        return firstDollar >= 0
+            ? mutatedClassName.substring(0, firstDollar)
+            : mutatedClassName;
+    }
+
     @Override
     public int compareTo(@Nonnull ModuleResult other) {
         return this.getMutationStats().getUndetected() - other.getMutationStats().getUndetected();
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -69,17 +76,7 @@ public class ModuleResult extends MutationResult<ModuleResult> {
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(report, name);
-    }
-
-    private String getClassName(Mutation mutation)
-    {
-        String mutatedClassName = mutation.getMutatedClass();
-        int firstDollar = mutatedClassName.indexOf('$');
-        return firstDollar >= 0
-            ? mutatedClassName.substring(0, firstDollar)
-            : mutatedClassName;
     }
 }

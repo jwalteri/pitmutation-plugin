@@ -18,8 +18,7 @@ import lombok.Getter;
 /**
  * @author Ed Kimber
  */
-public class MutatedClass extends MutationResult<MutatedClass>
-{
+public class MutatedClass extends MutationResult<MutatedClass> {
     private static final String END_HEADER_TAG = "</h1>";
 
     @Getter
@@ -31,8 +30,7 @@ public class MutatedClass extends MutationResult<MutatedClass>
     private Collection<Mutation> mutations;
     private Map<String, MutatedLine> mutatedLines;
 
-    public MutatedClass(String name, MutationResult parent, Collection<Mutation> mutations)
-    {
+    public MutatedClass(String name, MutationResult parent, Collection<Mutation> mutations) {
         super(name, parent);
         this.name = name;
         this.mutations = mutations;
@@ -44,8 +42,7 @@ public class MutatedClass extends MutationResult<MutatedClass>
         mutatedLines = createMutatedLines(mutations);
     }
 
-    private Map<String, MutatedLine> createMutatedLines(Collection<Mutation> mutations)
-    {
+    private Map<String, MutatedLine> createMutatedLines(Collection<Mutation> mutations) {
         return mutations.stream()
             .collect(groupingBy(Mutation::getLineNumber))
             .values()
@@ -55,8 +52,7 @@ public class MutatedClass extends MutationResult<MutatedClass>
     }
 
     @Override
-    public boolean isSourceLevel()
-    {
+    public boolean isSourceLevel() {
         return true;
     }
 
@@ -65,8 +61,7 @@ public class MutatedClass extends MutationResult<MutatedClass>
      * @return The source of the coverage report to show in the UI
      */
     @Override
-    public String getSourceFileContent()
-    {
+    public String getSourceFileContent() {
         String fullContents = getFileContents(package_ + File.separator + fileName);
         return fullContents.contains(END_HEADER_TAG) ? fullContents.substring(fullContents.indexOf(END_HEADER_TAG) + 5) :
             fullContents;
@@ -77,53 +72,44 @@ public class MutatedClass extends MutationResult<MutatedClass>
      * @return The source of the coverage report to show in the UI.
      */
     @Override
-    public String getStyleSheetContent()
-    {
+    public String getStyleSheetContent() {
         return getFileContents("style.css");
     }
 
-    private String getFileContents(String path)
-    {
+    private String getFileContents(String path) {
         String filePath =
             getOwner().getRootDir() + File.separator + "mutation-report-" + getParent().getParent().getName() +
                 File.separator + path;
-        try
-        {
+        try {
             return new TextFile(new File(filePath)).read();
         }
-        catch (IOException exception)
-        {
+        catch (IOException exception) {
             return "Could not read file: " + filePath + "\n";
         }
     }
 
 
-    public String getDisplayName()
-    {
+    public String getDisplayName() {
         return "Class: " + name;
     }
 
     @Override
-    public MutationStats getMutationStats()
-    {
+    public MutationStats getMutationStats() {
         return new MutationStatsImpl(getName(), mutations);
     }
 
     @Override
-    public Map<String, ? extends MutationResult<?>> getChildMap()
-    {
+    public Map<String, ? extends MutationResult<?>> getChildMap() {
         return mutatedLines;
     }
 
     @Override
-    public int compareTo(@Nonnull MutatedClass other)
-    {
+    public int compareTo(@Nonnull MutatedClass other) {
         return this.getMutationStats().getUndetected() - other.getMutationStats().getUndetected();
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -137,8 +123,7 @@ public class MutatedClass extends MutationResult<MutatedClass>
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(name, package_, fileName, mutations, mutatedLines);
     }
 }

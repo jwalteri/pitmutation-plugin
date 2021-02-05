@@ -67,8 +67,7 @@ public class MutatedLine extends MutationResult<MutatedLine> {
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -79,8 +78,7 @@ public class MutatedLine extends MutationResult<MutatedLine> {
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(lineNumber, mutations);
     }
 }
