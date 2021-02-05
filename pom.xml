@@ -71,7 +71,7 @@
         <dependency>
             <groupId>org.jenkins-ci</groupId>
             <artifactId>symbol-annotation</artifactId>
-            <version>1.20</version>
+            <version>1.21</version>
         </dependency>
 
         <!-- Required to pass RequireUpperBoundDeps error on compile -->
