@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The type Pit publisher.
@@ -158,7 +159,8 @@ public class PitPublisher extends Recorder implements SimpleBuildStep {
 
             final FilePath targetPath = new FilePath(buildTarget, "mutation-report-" + moduleName);
             try {
-                reports[i].getParent().copyRecursiveTo(targetPath);
+                FilePath parent = Optional.ofNullable(reports[i].getParent()).orElseThrow(() -> new IOException());
+                parent.copyRecursiveTo(targetPath);
             } catch (IOException e) {
                 Util.displayIOException(e, listener);
                 e.printStackTrace(listener.fatalError("Unable to copy coverage from " + reports[i] + " to " + buildTarget));
