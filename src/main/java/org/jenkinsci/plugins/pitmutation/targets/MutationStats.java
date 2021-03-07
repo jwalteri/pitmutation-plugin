@@ -30,8 +30,7 @@ public abstract class MutationStats {
 
     public String getKillPercentTextColor() { return getCoverageColors().getLineHexString();}
 
-    private CoverageRange getCoverageColors()
-    {
+    private CoverageRange getCoverageColors() {
         return CoverageRange.valueOf(getKillPercent());
     }
 

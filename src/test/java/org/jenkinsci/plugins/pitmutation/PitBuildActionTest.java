@@ -19,16 +19,14 @@ import hudson.model.Result;
 /**
  * @author edward
  */
-public class PitBuildActionTest
-{
+public class PitBuildActionTest {
     private PitBuildAction action;
     private AbstractBuild owner;
     private AbstractBuild failedBuild;
     private AbstractBuild successBuild;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         failedBuild = mock(AbstractBuild.class);
         when(failedBuild.getResult()).thenReturn(Result.FAILURE);
         successBuild = mock(AbstractBuild.class);
@@ -45,21 +43,18 @@ public class PitBuildActionTest
     }
 
     @Test
-    public void previousReturnsNullIfNoPreviousBuilds()
-    {
+    public void previousReturnsNullIfNoPreviousBuilds() {
         assertThat(action.getPreviousAction(), nullValue());
     }
 
     @Test
-    public void previousReturnsNullIfAllPreviousBuildsFailed()
-    {
+    public void previousReturnsNullIfAllPreviousBuildsFailed() {
         when(owner.getPreviousBuild()).thenReturn(failedBuild);
         assertThat(action.getPreviousAction(), nullValue());
     }
 
     @Test
-    public void previousReturnsLastSuccessfulBuild()
-    {
+    public void previousReturnsLastSuccessfulBuild() {
         PitBuildAction previousSucccessAction = mock(PitBuildAction.class);
         when(owner.getPreviousBuild()).thenReturn(failedBuild);
         when(failedBuild.getPreviousBuild()).thenReturn(successBuild);
