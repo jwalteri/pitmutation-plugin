@@ -34,6 +34,9 @@ import java.util.Optional;
  */
 public class PitPublisher extends Recorder implements SimpleBuildStep {
 
+    public static final String SINGLE_MODULE_REPORT_FOLDER = "mutation-report-all";
+    public static final String MULTI_MODULE_REPORT_FORMAT = "mutation-report-%s";
+
     private List<Condition> buildConditions;
     private String mutationStatsFile;
     private boolean killRatioMustImprove;
@@ -117,8 +120,12 @@ public class PitPublisher extends Recorder implements SimpleBuildStep {
 
             ParseReportCallable fileCallable = new ParseReportCallable(mutationStatsFile);
             FilePath[] reports = workspace.act(fileCallable);
-            publishReports(reports, new FilePath(build.getRootDir()), workspace.getRemote());
-
+            FilePath buildTarget = new FilePath(build.getRootDir());
+            if (reports.length == 1) {
+                copyMutationReports(reports[0], buildTarget, SINGLE_MODULE_REPORT_FOLDER);
+            } else {
+                publishReports(reports, buildTarget, workspace.getRemote());
+            }
             PitBuildAction action = new PitBuildAction(build);
             build.addAction(action);
             build.setResult(decideBuildResult(action));
@@ -156,18 +163,21 @@ public class PitPublisher extends Recorder implements SimpleBuildStep {
                     moduleName = String.valueOf(i == 0 ? null : i);
                 }
             }
+            copyMutationReports(reports[i], buildTarget, String.format(MULTI_MODULE_REPORT_FORMAT, moduleName));
+        }
+    }
 
-            final FilePath targetPath = new FilePath(buildTarget, "mutation-report-" + moduleName);
-            try {
-                FilePath parent = Optional.ofNullable(reports[i].getParent()).orElseThrow(() -> new IOException());
-                parent.copyRecursiveTo(targetPath);
-            } catch (IOException e) {
-                Util.displayIOException(e, listener);
-                e.printStackTrace(listener.fatalError("Unable to copy coverage from " + reports[i] + " to " + buildTarget));
-                build.setResult(Result.FAILURE);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+    private void copyMutationReports(FilePath source, FilePath buildTarget, String mutationFilePath) {
+        final FilePath targetPath = new FilePath(buildTarget, mutationFilePath);
+        try {
+            FilePath parent = Optional.ofNullable(source.getParent()).orElseThrow(() -> new IOException());
+            parent.copyRecursiveTo(targetPath);
+        } catch (IOException e) {
+            Util.displayIOException(e, listener);
+            e.printStackTrace(listener.fatalError("Unable to copy coverage from " + source + " to " + buildTarget));
+            build.setResult(Result.FAILURE);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

@@ -1,17 +1,15 @@
 package org.jenkinsci.plugins.pitmutation.targets;
 
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.jenkinsci.plugins.pitmutation.Mutation;
-import org.jenkinsci.plugins.pitmutation.MutationReport;
+import static org.jenkinsci.plugins.pitmutation.PitPublisher.MULTI_MODULE_REPORT_FORMAT;
 
-import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
-import static java.util.stream.Collectors.groupingBy;
+import org.jenkinsci.plugins.pitmutation.MutationReport;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author edward
@@ -41,22 +39,12 @@ public class ModuleResult extends MutationResult<ModuleResult> {
 
     @Override
     public Map<String, MutatedPackage> getChildMap() {
-        Map<String, MutatedPackage> childMap = new HashMap<>();
-        for (String packageName : report.getMutationsByPackage().keySet()) {
-            Map<String, List<Mutation>> classMutations =
-                report.getMutationsForPackage(packageName).stream().collect(groupingBy(this::getClassName));
-
-            childMap.put(packageName, new MutatedPackage(packageName, this, classMutations));
-        }
-        return childMap;
+        return new ModuleChildMapBuilder(report, this).build();
     }
 
-    private String getClassName(Mutation mutation) {
-        String mutatedClassName = mutation.getMutatedClass();
-        int firstDollar = mutatedClassName.indexOf('$');
-        return firstDollar >= 0
-            ? mutatedClassName.substring(0, firstDollar)
-            : mutatedClassName;
+    @Override
+    protected String getMutationReportDirectory() {
+        return String.format(MULTI_MODULE_REPORT_FORMAT, getName());
     }
 
     @Override

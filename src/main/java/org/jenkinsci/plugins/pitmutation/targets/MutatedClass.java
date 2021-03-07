@@ -78,7 +78,7 @@ public class MutatedClass extends MutationResult<MutatedClass> {
 
     private String getFileContents(String path) {
         String filePath =
-            getOwner().getRootDir() + File.separator + "mutation-report-" + getParent().getParent().getName() +
+            getOwner().getRootDir() + File.separator + getMutationReportDirectory() +
                 File.separator + path;
         try {
             return new TextFile(new File(filePath)).read();

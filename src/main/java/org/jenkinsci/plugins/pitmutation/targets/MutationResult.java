@@ -121,6 +121,10 @@ public abstract class MutationResult<T extends MutationResult> implements Compar
         return url.toString();
     }
 
+    protected String getMutationReportDirectory() {
+        return parent.getMutationReportDirectory();
+    }
+
     static String urlTransform(String token) {
         StringBuilder buf = new StringBuilder(token.length());
         for (int i = 0; i < token.length(); i++) {

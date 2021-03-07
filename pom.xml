@@ -24,7 +24,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.level>8</java.level>
-        <jenkins.version>2.277</jenkins.version>
+        <jenkins.version>2.199</jenkins.version>
         <slf4jVersion>1.7.30</slf4jVersion> <!-- Required as require upper bound fails due to jenkins 2.199 -->
     </properties>
 

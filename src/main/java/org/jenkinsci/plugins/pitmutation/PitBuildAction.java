@@ -9,7 +9,9 @@ import hudson.util.ChartUtil;
 import hudson.util.DataSetBuilder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.jenkinsci.plugins.pitmutation.targets.ProjectMutations;
+
+import org.jenkinsci.plugins.pitmutation.targets.BaseResultFactory;
+import org.jenkinsci.plugins.pitmutation.targets.MutationResult;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
@@ -57,12 +59,12 @@ public class PitBuildAction implements HealthReportingAction, StaplerProxy {
     }
 
     @Override
-    public ProjectMutations getTarget() {
+    public MutationResult getTarget() {
         return getReport();
     }
 
-    public ProjectMutations getReport() {
-        return new ProjectMutations(this);
+    public MutationResult getReport() {
+        return BaseResultFactory.getBaseMutationResultFrom(this);
     }
 
     public synchronized Map<String, MutationReport> getReports() {
