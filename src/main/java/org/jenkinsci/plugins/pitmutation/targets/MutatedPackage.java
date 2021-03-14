@@ -52,20 +52,17 @@ public class MutatedPackage extends MutationResult<MutatedPackage> {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(this);
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        MutatedPackage that = (MutatedPackage) o;
+        return Objects.equals(classMutations, that.classMutations);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof MutatedPackage)) {
-            return false;
-        }
-
-        return Objects.equals(getMutationStats().getUndetected(), ((MutatedPackage) obj).getMutationStats().getUndetected());
+    public int hashCode() {
+        return Objects.hash(classMutations);
     }
 }

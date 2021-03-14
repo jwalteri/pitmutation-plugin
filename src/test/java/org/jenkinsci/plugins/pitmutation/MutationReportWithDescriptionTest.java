@@ -1,17 +1,17 @@
 package org.jenkinsci.plugins.pitmutation;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.xml.sax.SAXException;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.Is.is;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
 /**
  * @author edward

@@ -1,17 +1,15 @@
 package org.jenkinsci.plugins.pitmutation.targets;
 
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.jenkinsci.plugins.pitmutation.Mutation;
-import org.jenkinsci.plugins.pitmutation.MutationReport;
+import static org.jenkinsci.plugins.pitmutation.PitPublisher.MULTI_MODULE_REPORT_FORMAT;
 
-import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
-import static java.util.stream.Collectors.groupingBy;
+import org.jenkinsci.plugins.pitmutation.MutationReport;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author edward
@@ -41,14 +39,12 @@ public class ModuleResult extends MutationResult<ModuleResult> {
 
     @Override
     public Map<String, MutatedPackage> getChildMap() {
-        Map<String, MutatedPackage> childMap = new HashMap<>();
-        for (String packageName : report.getMutationsByPackage().keySet()) {
-            Map<String, List<Mutation>> classMutations =
-                report.getMutationsForPackage(packageName).stream().collect(groupingBy(Mutation::getMutatedClass));
+        return new ModuleChildMapBuilder(report, this).build();
+    }
 
-            childMap.put(packageName, new MutatedPackage(packageName, this, classMutations));
-        }
-        return childMap;
+    @Override
+    protected String getMutationReportDirectory() {
+        return String.format(MULTI_MODULE_REPORT_FORMAT, getName());
     }
 
     @Override
@@ -57,20 +53,18 @@ public class ModuleResult extends MutationResult<ModuleResult> {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(this);
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ModuleResult that = (ModuleResult) o;
+        return Objects.equals(report, that.report) &&
+            Objects.equals(name, that.name);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof ModuleResult)) {
-            return false;
-        }
-
-        return Objects.equals(getMutationStats().getUndetected(), ((ModuleResult) obj).getMutationStats().getUndetected());
+    public int hashCode() {
+        return Objects.hash(report, name);
     }
 }

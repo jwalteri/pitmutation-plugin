@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The type Pit publisher.
@@ -32,6 +33,9 @@ import java.util.List;
  * @author edward
  */
 public class PitPublisher extends Recorder implements SimpleBuildStep {
+
+    public static final String SINGLE_MODULE_REPORT_FOLDER = "mutation-report-all";
+    public static final String MULTI_MODULE_REPORT_FORMAT = "mutation-report-%s";
 
     private List<Condition> buildConditions;
     private String mutationStatsFile;
@@ -116,8 +120,12 @@ public class PitPublisher extends Recorder implements SimpleBuildStep {
 
             ParseReportCallable fileCallable = new ParseReportCallable(mutationStatsFile);
             FilePath[] reports = workspace.act(fileCallable);
-            publishReports(reports, new FilePath(build.getRootDir()), null);
-
+            FilePath buildTarget = new FilePath(build.getRootDir());
+            if (reports.length == 1) {
+                copyMutationReports(reports[0], buildTarget, SINGLE_MODULE_REPORT_FOLDER);
+            } else {
+                publishReports(reports, buildTarget, workspace.getRemote());
+            }
             PitBuildAction action = new PitBuildAction(build);
             build.addAction(action);
             build.setResult(decideBuildResult(action));
@@ -155,35 +163,21 @@ public class PitPublisher extends Recorder implements SimpleBuildStep {
                     moduleName = String.valueOf(i == 0 ? null : i);
                 }
             }
-
-            final FilePath targetPath = new FilePath(buildTarget, "mutation-report-" + moduleName);
-            try {
-                reports[i].getParent().copyRecursiveTo(targetPath);
-            } catch (IOException e) {
-                Util.displayIOException(e, listener);
-                e.printStackTrace(listener.fatalError("Unable to copy coverage from " + reports[i] + " to " + buildTarget));
-                build.setResult(Result.FAILURE);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            copyMutationReports(reports[i], buildTarget, String.format(MULTI_MODULE_REPORT_FORMAT, moduleName));
         }
     }
 
-    /**
-     * Mutations report exists boolean.
-     *
-     * @param reportDir the report dir
-     * @return the boolean
-     */
-    boolean mutationsReportExists(FilePath reportDir) {
-        if (reportDir == null) {
-            return false;
-        }
+    private void copyMutationReports(FilePath source, FilePath buildTarget, String mutationFilePath) {
+        final FilePath targetPath = new FilePath(buildTarget, mutationFilePath);
         try {
-            FilePath[] search = reportDir.list("**/mutations.xml");
-            return search.length > 0;
-        } catch (IOException | InterruptedException e) {
-            return false;
+            FilePath parent = Optional.ofNullable(source.getParent()).orElseThrow(() -> new IOException());
+            parent.copyRecursiveTo(targetPath);
+        } catch (IOException e) {
+            Util.displayIOException(e, listener);
+            e.printStackTrace(listener.fatalError("Unable to copy coverage from " + source + " to " + buildTarget));
+            build.setResult(Result.FAILURE);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -285,15 +279,6 @@ public class PitPublisher extends Recorder implements SimpleBuildStep {
         return BuildStepMonitor.BUILD;
     }
 
-    private FilePath getReportDir(FilePath root) throws IOException, InterruptedException {
-        FilePath reportsDir = new FilePath(root, mutationStatsFile);
-        if (reportsDir.isDirectory()) {
-            return reportsDir;
-        } else {
-            return reportsDir.getParent();
-        }
-    }
-
     /**
      * The type Descriptor.
      */
@@ -327,18 +312,6 @@ public class PitPublisher extends Recorder implements SimpleBuildStep {
             save();
             return super.configure(req, formData);
         }
-
-//        /**
-//         * Creates a new instance of {@link PitPublisher} from a submitted form.
-//         */
-//        @Override
-//        public PitPublisher newInstance(@Nullable StaplerRequest req, @Nonnull JSONObject formData) {
-//            if (req == null) {
-//                throw new IllegalArgumentException("");
-//            }
-//            super.newInstance(req, formData);
-//            return req.bindJSON(PitPublisher.class, formData);
-//        }
     }
 
     /**

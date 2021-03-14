@@ -25,7 +25,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.level>8</java.level>
         <jenkins.version>2.199</jenkins.version>
-        <slf4jVersion>1.7.26</slf4jVersion> <!-- Required as require upper bound fails due to jenkins 2.199 -->
+        <slf4jVersion>1.7.30</slf4jVersion> <!-- Required as require upper bound fails due to jenkins 2.199 -->
     </properties>
 
     <developers>
@@ -110,6 +110,11 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.jenkins-ci.tools</groupId>
+                <artifactId>maven-hpi-plugin</artifactId>
+                <version>3.17</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

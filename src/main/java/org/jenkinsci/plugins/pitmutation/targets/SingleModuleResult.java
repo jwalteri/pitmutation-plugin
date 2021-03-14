@@ -1,21 +1,23 @@
 package org.jenkinsci.plugins.pitmutation.targets;
 
-import hudson.model.Run;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+
 import org.jenkinsci.plugins.pitmutation.MutationReport;
 import org.jenkinsci.plugins.pitmutation.PitBuildAction;
+import org.jenkinsci.plugins.pitmutation.PitPublisher;
 
-import javax.annotation.Nonnull;
-import java.util.*;
+import hudson.model.Run;
 
-/**
- * @author Ed Kimber
- */
-public class ProjectMutations extends MutationResult<ProjectMutations> {
+public class SingleModuleResult extends MutationResult<SingleModuleResult> {
 
-    private PitBuildAction action;
+    private final PitBuildAction action;
 
-    public ProjectMutations(PitBuildAction action) {
-        super("aggregate", null);
+    public SingleModuleResult(PitBuildAction action) {
+        super("packages", null);
         this.action = action;
     }
 
@@ -45,26 +47,31 @@ public class ProjectMutations extends MutationResult<ProjectMutations> {
 
     @Override
     public String getName() {
-        return "Aggregated Reports";
+        return "Packages";
     }
 
+    @Override
     public String getDisplayName() {
-        return "Modules";
+        return "Packages";
+    }
+
+    @Override
+    protected String getMutationReportDirectory() {
+        return PitPublisher.SINGLE_MODULE_REPORT_FOLDER;
     }
 
     @Override
     public Map<String, ? extends MutationResult<?>> getChildMap() {
-        Map<String, ModuleResult> childMap = new HashMap<>();
-        Map<String, MutationReport> reports = action.getReports();
-        for (Map.Entry<String, MutationReport> report : reports.entrySet()) {
-            String reportName = report.getKey();
-            childMap.put(reportName, new ModuleResult(reportName, this, report.getValue()));
+        final Map<String, MutationReport> reports = action.getReports();
+        if (reports.size() != 1) {
+            throw new IllegalStateException("Expected one report.");
         }
-        return childMap;
+        final MutationReport report = reports.values().stream().findFirst().orElse(null);
+        return new ModuleChildMapBuilder(report, this).build();
     }
 
     @Override
-    public int compareTo(@Nonnull ProjectMutations other) {
+    public int compareTo(@Nonnull SingleModuleResult other) {
         return this.getMutationStats().getUndetected() - other.getMutationStats().getUndetected();
     }
 
@@ -74,7 +81,7 @@ public class ProjectMutations extends MutationResult<ProjectMutations> {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        ProjectMutations that = (ProjectMutations) o;
+        SingleModuleResult that = (SingleModuleResult) o;
         return Objects.equals(action, that.action);
     }
 

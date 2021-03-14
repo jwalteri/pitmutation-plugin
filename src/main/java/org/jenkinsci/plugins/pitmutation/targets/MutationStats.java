@@ -3,6 +3,8 @@ package org.jenkinsci.plugins.pitmutation.targets;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.jenkinsci.plugins.pitmutation.portlets.CoverageRange;
+
 /**
  * @author Ed Kimber
  */
@@ -20,6 +22,16 @@ public abstract class MutationStats {
 
     public float getKillPercent() {
         return round(100f * (float) (getTotalMutations() - getUndetected()) / (float) getTotalMutations());
+    }
+
+    public String getKillPercentFillColor() {
+        return getCoverageColors().getFillHexString();
+    }
+
+    public String getKillPercentTextColor() { return getCoverageColors().getLineHexString();}
+
+    private CoverageRange getCoverageColors() {
+        return CoverageRange.valueOf(getKillPercent());
     }
 
     private float round(float ratio) {

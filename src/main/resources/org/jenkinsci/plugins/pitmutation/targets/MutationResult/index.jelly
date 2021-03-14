@@ -1,4 +1,9 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+    <j:if test="${it.sourceLevel}">
+        <style type="text/css">
+            <j:out value="${it.styleSheetContent}"/>
+        </style>
+    </j:if>
     <l:layout title="">
         <st:include it="${it.owner}" page="sidepanel.jelly"/>
         <l:main-panel>
@@ -31,7 +36,7 @@
                     </td>
                 </tr>
             </table>
-
+            <j:if test="${!it.sourceLevel}">
             <h2>Components</h2>
             <table border="1px" class="pane sortable">
                 <tr>
@@ -64,7 +69,7 @@
                         <td>
                             <j:if test="${child.statsDelta.undetected &gt; 0}">+</j:if>${child.statsDelta.undetected}
                         </td>
-                        <td data="${child.mutationStats.killPercent}">
+                        <td style="color:#${child.mutationStats.killPercentTextColor}; background-color:#${child.mutationStats.killPercentFillColor};" data="${child.mutationStats.killPercent}">
                             ${child.mutationStats.killPercent}&#37;
                         </td>
                         <td>
@@ -80,6 +85,7 @@
                     </tr>
                 </j:forEach>
             </table>
+            </j:if>
 
             <j:if test="${it.coverageAltered}">
                 <h1>Coverage Changes</h1>
@@ -90,7 +96,6 @@
             </j:if>
 
             <j:if test="${it.sourceLevel}">
-                <h1>Source</h1>
                 <j:out value="${it.sourceFileContent}"/>
             </j:if>
         </l:main-panel>

@@ -27,22 +27,22 @@ public class CoverageRangeTest {
 
     @Test
     public void valueOfFiftyReturnsPoor() {
-        assertThat(CoverageRange.valueOf(50D), is(POOR));
+        assertThat(CoverageRange.valueOf(50D), is(AVERAGE));
     }
 
     @Test
     public void valueOfSeventyFiveReturnsFair() {
-        assertThat(CoverageRange.valueOf(75D), is(FAIR));
+        assertThat(CoverageRange.valueOf(75D), is(SUFFICIENT));
     }
 
     @Test
     public void valueOfEightyFiveReturnsSufficient() {
-        assertThat(CoverageRange.valueOf(85D), is(SUFFICIENT));
+        assertThat(CoverageRange.valueOf(85D), is(GOOD));
     }
 
     @Test
     public void valueOfNinetyTwoReturnsGood() {
-        assertThat(CoverageRange.valueOf(92D), is(GOOD));
+        assertThat(CoverageRange.valueOf(92D), is(EXCELLENT));
     }
 
     @Test
@@ -62,12 +62,12 @@ public class CoverageRangeTest {
 
     @Test
     public void getFillHexStringForAbysmal() {
-        assertThat(ABYSMAL.getFillHexString(), is("000000"));
+        assertThat(ABYSMAL.getFillHexString(), is("FF0000"));
     }
 
     @Test
     public void getFillHexStringForTragic() {
-        assertThat(TRAGIC.getFillHexString(), is("FF0000"));
+        assertThat(TRAGIC.getFillHexString(), is("FF4500"));
     }
 
     @Test
@@ -142,27 +142,27 @@ public class CoverageRangeTest {
 
     @Test
     public void fillColorOfMinusOneReturnsAbysmalFloor() {
-        assertThat(CoverageRange.fillColorOf(-1D), is(new Color(0, 0, 0)));
+        assertThat(CoverageRange.fillColorOf(-1D), is(new Color(255, 0, 0)));
     }
 
     @Test
     public void fillColorOfThirtyReturnsProportionateBlend() {
-        assertThat(CoverageRange.fillColorOf(30D), is(new Color(255, 25, 0)));
+        assertThat(CoverageRange.fillColorOf(30D), is(new Color(255, 88, 0)));
     }
 
     @Test
     public void fillColorOfThirtySevenFiveReturnsProportionateBlend() {
-        assertThat(CoverageRange.fillColorOf(37.5), is(new Color(255, 63, 0)));
+        assertThat(CoverageRange.fillColorOf(37.5), is(new Color(255, 117, 0)));
     }
 
     @Test
     public void fillColorOfFortyFiveReturnsProportionateBlend() {
-        assertThat(CoverageRange.fillColorOf(45D), is(new Color(255, 101, 0)));
+        assertThat(CoverageRange.fillColorOf(45D), is(new Color(255, 146, 0)));
     }
 
     @Test
     public void fillColorOfFiftyFloorFillColor() {
-        assertThat(CoverageRange.fillColorOf(50D), is(new Color(255, 127, 0)));
+        assertThat(CoverageRange.fillColorOf(50D), is(new Color(255, 165, 0)));
     }
 
     @Test

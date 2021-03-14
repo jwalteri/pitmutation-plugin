@@ -13,8 +13,8 @@ import java.util.*;
  */
 public class MutationReport {
 
-    private Map<String, List<Mutation>> mutationsByPackage;
-    private Map<String, List<Mutation>> mutationsByClass;
+    private final Map<String, List<Mutation>> mutationsByPackage;
+    private final Map<String, List<Mutation>> mutationsByClass;
     private int killCount = 0;
 
     public MutationReport() {
@@ -35,8 +35,13 @@ public class MutationReport {
         digester.addSetNestedProperties("mutations/mutation");
 
         MutationReport report = digester.parse(input);
-        report.mutationsByClass.forEach((className, mutations) ->
-            report.mutationsByPackage.computeIfAbsent(className, k -> new ArrayList<>()).addAll(mutations));
+        report.mutationsByClass.forEach((className, mutations) -> {
+            String packageName = packageNameFromClass(className);
+            List<Mutation> existingPackageMutations = report.mutationsByPackage
+                .computeIfAbsent(packageName, k -> new ArrayList<>());
+            mutations.stream().filter(mutation -> !existingPackageMutations.contains(mutation))
+                .forEach(mutation -> report.mutationsByPackage.get(packageName).add(mutation));
+        });
         return report;
     }
 
