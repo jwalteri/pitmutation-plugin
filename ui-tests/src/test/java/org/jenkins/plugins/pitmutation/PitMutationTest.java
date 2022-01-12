@@ -6,6 +6,10 @@ import org.jenkinsci.test.acceptance.po.Job;
 import org.jenkinsci.test.acceptance.po.WorkflowJob;
 import org.junit.Test;
 
+import java.util.Locale;
+
+import static org.assertj.core.api.Assertions.*;
+
 @WithPlugins({"pitmutation", "pipeline-stage-step", "workflow-durable-task-step", "workflow-basic-steps",
     "workflow-job", "workflow-scm-step", "workflow-cps"})
 // "pipeline-stage-step", "workflow-durable-task-step", "workflow-basic-steps"
@@ -37,6 +41,9 @@ public class PitMutationTest extends UiTest {
 
         UiTestObject sut = new UiTestObject(build, "pitmutation");
 
+        assertThat(sut.getBuildStatusSVG().getText()).contains("successful");
+        assertThat(sut.getAll().getText()).contains("PIT Mutation Report");
+
         System.out.println("test");
     }
 
@@ -44,3 +51,4 @@ public class PitMutationTest extends UiTest {
         return job.startBuild().waitUntilFinished();
     }
 }
+
