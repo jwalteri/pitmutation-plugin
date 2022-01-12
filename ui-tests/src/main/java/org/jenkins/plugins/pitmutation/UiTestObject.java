@@ -40,4 +40,21 @@ public class UiTestObject extends PageObject {
 
         return svg.orElse(null);
     }
+
+    public WebElement getConsoleOutput() {
+        //WebElement pitMutationButton = page.findElement(by.href("/job/appropriate_operation/1/pitmutation"));
+        List<WebElement> test = page.findElements(by.tagName("a")).stream()
+            .filter(x -> x.getText().contains("PIT Mutation Report"))
+            .collect(Collectors.toList());
+
+        WebElement button = test.get(0);
+        String link = button.getAttribute("href");
+        UiTestObject2 retVal = newInstance(UiTestObject2.class, injector, url(link), "test");
+        button.click();
+
+        retVal.getConsoleOutput();
+
+        //pitMutationButton.click();
+        return page.findElement(by.id("out"));
+    }
 }
