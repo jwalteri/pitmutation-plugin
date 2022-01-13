@@ -12,9 +12,27 @@ import static org.assertj.core.api.Assertions.assertThat;
     "workflow-job", "workflow-scm-step", "workflow-cps"})
 public class PitMutationTest extends UiTest {
 
+    @Test
+    public void PitMutationReport() {
+        WorkflowJob job = jenkins.jobs.create(WorkflowJob.class);
+        job.script.set("node {\n" +
+            job.copyResourceStep("/PitMutationTest/mutations.xml") + "\n" +
+            "pitmutation killRatioMustImprove: false, minimumKillRatio: 50.0, mutationStatsFile: '**.xml'\n" +
+            "}");
+
+        job.save();
+
+        Build build = buildJob(job);
+
+        //DashboardView dashboardView = new DashboardView(build, "pitmutation");
+        //ConsoleView consoleView = dashboardView.openConsoleView();
+        ConsoleView consoleView = new ConsoleView(build, "console");
+
+        assertThat(consoleView.getConsoleOutput()).contains("Finished: SUCCESS");
+    }
 
     @Test
-    public void simpleTest() {
+    public void BuildSuccessful() {
         WorkflowJob job = jenkins.jobs.create(WorkflowJob.class);
         job.script.set("node {\n" +
             job.copyResourceStep("/PitMutationTest/mutations.xml") + "\n" +
@@ -26,9 +44,6 @@ public class PitMutationTest extends UiTest {
         Build build = buildJob(job);
 
         DashboardView dashboardView = new DashboardView(build, "pitmutation");
-        ConsoleView consoleView = dashboardView.getConsoleView();
-
-        assertThat(consoleView.getConsoleOutput()).contains("Finished: SUCCESS");
     }
 
 
