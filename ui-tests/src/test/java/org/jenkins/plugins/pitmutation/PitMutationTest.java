@@ -12,8 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
     "workflow-job", "workflow-scm-step", "workflow-cps"})
 public class PitMutationTest extends UiTest {
 
-    @Test
-    public void PitMutationReport() {
+    //@Test
+    public void BuildSuccessful() {
         WorkflowJob job = jenkins.jobs.create(WorkflowJob.class);
         job.script.set("node {\n" +
             job.copyResourceStep("/PitMutationTest/mutations.xml") + "\n" +
@@ -32,7 +32,7 @@ public class PitMutationTest extends UiTest {
     }
 
     @Test
-    public void BuildSuccessful() {
+    public void PitMutationReport() {
         WorkflowJob job = jenkins.jobs.create(WorkflowJob.class);
         job.script.set("node {\n" +
             job.copyResourceStep("/PitMutationTest/mutations.xml") + "\n" +
@@ -44,6 +44,9 @@ public class PitMutationTest extends UiTest {
         Build build = buildJob(job);
 
         DashboardView dashboardView = new DashboardView(build, "pitmutation");
+        dashboardView.openPitMutationView();
+
+        System.out.println("asd");
     }
 
 

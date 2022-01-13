@@ -55,7 +55,7 @@ public class DashboardView extends PageObject {
     }
 
     public ConsoleView openPitMutationView () {
-        return openPage(getConsoleOutputLink(), ConsoleView.class);
+        return openPage(getPitMutationLink(), ConsoleView.class);
     }
 
     public ConsoleView openConsoleView() {
