@@ -1,10 +1,11 @@
 package org.jenkins.plugins.pitmutation;
 
+import com.google.inject.Injector;
 import org.jenkinsci.test.acceptance.po.Build;
 import org.jenkinsci.test.acceptance.po.PageObject;
 import org.openqa.selenium.WebElement;
 
-import java.util.Optional;
+import java.net.URL;
 
 public class PitMutationView extends PageObject {
     private WebElement dashboard;
@@ -13,6 +14,10 @@ public class PitMutationView extends PageObject {
         super(parent, parent.url(id));
         this.open();
         this.dashboard = this.getElement(by.tagName("body"));
+    }
+
+    public PitMutationView(final Injector injector, final URL url, final String id) {
+        super(injector, url);
     }
 
     public String getConsoleOutput() {

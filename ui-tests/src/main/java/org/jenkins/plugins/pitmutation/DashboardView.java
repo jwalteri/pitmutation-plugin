@@ -4,9 +4,7 @@ import org.jenkinsci.test.acceptance.po.Build;
 import org.jenkinsci.test.acceptance.po.PageObject;
 import org.openqa.selenium.WebElement;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class DashboardView extends PageObject {
     private WebElement dashboard;
@@ -18,17 +16,6 @@ public class DashboardView extends PageObject {
         this.dashboard = this.getElement(by.tagName("body"));
         this.id = id;
     }
-/*
-    public ConsoleView getConsoleView() {
-
-
-        String link = consoleOutputButton.getAttribute("href");
-        ConsoleView consoleView = newInstance(ConsoleView.class, injector, url(link), "test");
-        consoleOutputButton.click();
-        consoleView.initConsoleView();
-
-        return consoleView;
-    }*/
 
     private WebElement getPitMutationLink() {
         Optional<WebElement> consoleOutput = this.dashboard.findElements(by.tagName("a")).stream()
@@ -54,8 +41,8 @@ public class DashboardView extends PageObject {
         return consoleOutput.get();
     }
 
-    public ConsoleView openPitMutationView () {
-        return openPage(getPitMutationLink(), ConsoleView.class);
+    public PitMutationView openPitMutationView () {
+        return openPage(getPitMutationLink(), PitMutationView.class);
     }
 
     public ConsoleView openConsoleView() {

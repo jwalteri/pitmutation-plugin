@@ -14,18 +14,7 @@ public class PitMutationTest extends UiTest {
 
     //@Test
     public void BuildSuccessful() {
-        WorkflowJob job = jenkins.jobs.create(WorkflowJob.class);
-        job.script.set("node {\n" +
-            job.copyResourceStep("/PitMutationTest/mutations.xml") + "\n" +
-            "pitmutation killRatioMustImprove: false, minimumKillRatio: 50.0, mutationStatsFile: '**.xml'\n" +
-            "}");
-
-        job.save();
-
-        Build build = buildJob(job);
-
-        //DashboardView dashboardView = new DashboardView(build, "pitmutation");
-        //ConsoleView consoleView = dashboardView.openConsoleView();
+        Build build = createAndBuildWorkflowJob();
         ConsoleView consoleView = new ConsoleView(build, "console");
 
         assertThat(consoleView.getConsoleOutput()).contains("Finished: SUCCESS");
@@ -33,15 +22,7 @@ public class PitMutationTest extends UiTest {
 
     @Test
     public void PitMutationReport() {
-        WorkflowJob job = jenkins.jobs.create(WorkflowJob.class);
-        job.script.set("node {\n" +
-            job.copyResourceStep("/PitMutationTest/mutations.xml") + "\n" +
-            "pitmutation killRatioMustImprove: false, minimumKillRatio: 50.0, mutationStatsFile: '**.xml'\n" +
-            "}");
-
-        job.save();
-
-        Build build = buildJob(job);
+        Build build = createAndBuildWorkflowJob();
 
         DashboardView dashboardView = new DashboardView(build, "pitmutation");
         dashboardView.openPitMutationView();
@@ -49,6 +30,20 @@ public class PitMutationTest extends UiTest {
         System.out.println("asd");
     }
 
+    private Build createAndBuildWorkflowJob() {
+        return buildJob(createWorkflowJob());
+    }
+
+    private WorkflowJob createWorkflowJob() {
+        WorkflowJob job = jenkins.jobs.create(WorkflowJob.class);
+        job.script.set("node {\n" +
+            job.copyResourceStep("/PitMutationTest/mutations.xml") + "\n" +
+            "pitmutation killRatioMustImprove: false, minimumKillRatio: 50.0, mutationStatsFile: '**.xml'\n" +
+            "}");
+
+        job.save();
+        return job;
+    }
 
     protected Build buildJob(final Job job) {
         return job.startBuild().waitUntilFinished();
