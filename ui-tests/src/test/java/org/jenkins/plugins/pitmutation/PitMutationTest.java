@@ -11,13 +11,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.contentOf;
 
 @WithPlugins({"pitmutation", "pipeline-stage-step", "workflow-durable-task-step", "workflow-basic-steps",
     "workflow-job", "workflow-scm-step", "workflow-cps"})
 public class PitMutationTest extends UiTest {
 
     //@Test
-    public void BuildSuccessful() throws MalformedURLException {
+    public void BuildSuccessful() {
         Build build = createAndBuildWorkflowJob();
         ConsoleView consoleView = new ConsoleView(build, "console");
 
@@ -25,42 +26,61 @@ public class PitMutationTest extends UiTest {
     }
 
     @Test
-    public void PitMutationReport() throws MalformedURLException {
+    public void verifyOverallMutationStatistics() {
         Build build = createAndBuildWorkflowJob();
 
         DashboardView dashboardView = new DashboardView(build, "pitmutation");
-        dashboardView.openPitMutationView();
+        MutationTableView mutationTableView = dashboardView.openPitMutationView();
+        mutationTableView.initialize();
+        MutationStatistics mutationStatistics = mutationTableView.getMutationStatistics();
+
+        assertThat(mutationStatistics.getMutations().getName()).isEqualTo("Mutations");
+        assertThat(mutationStatistics.getMutations().getValue()).isEqualTo("189 (+189)");
+        assertThat(mutationStatistics.getUndetected().getName()).isEqualTo("Undetected");
+        assertThat(mutationStatistics.getUndetected().getValue()).isEqualTo("18 (+18)");
+        assertThat(mutationStatistics.getCoverage().getName()).isEqualTo("Coverage");
+        assertThat(mutationStatistics.getCoverage().getValue()).isEqualTo("90.476% (+90.476%)");
+
+        ComponentTable componentTable = mutationTableView.getComponentTable();
+
+        //assertThat(componentTable.getComponentTableEntries().size()).isEqualTo(9);
+
+        MutationTableView second = mutationTableView.clickRowLink(0);
+        second.initialize();
+
+        MutationStatistics secondMutationStatistics = second.getMutationStatistics();
+        ComponentTable secondComponentTable = second.getComponentTable();
+
+        assertThat(secondMutationStatistics.getMutations().getName()).isEqualTo("Mutations");
+        assertThat(secondComponentTable.getComponentTableEntries().size()).isEqualTo(16);
+
+    }
+
+    //@Test
+    public void verifyMutationHierarchy() {
+        Build build = createAndBuildWorkflowJob();
+
+        DashboardView dashboardView = new DashboardView(build, "");
+        MutationTableView pitMutationView = dashboardView.openPitMutationView();
 
         System.out.println("asd");
     }
 
-    private Build createAndBuildWorkflowJob() throws MalformedURLException {
+    private Build createAndBuildWorkflowJob() {
         return buildJob(createWorkflowJob());
     }
 
-    private WorkflowJob createWorkflowJob() throws MalformedURLException {
+    private WorkflowJob createWorkflowJob() {
         WorkflowJob job = jenkins.jobs.create(WorkflowJob.class);
-
-        //String a = job.copyResourceStep("/PitMutationTest/edu.hm.hafner.util/PathUtil.java.html");
-        //a = a.replace("mkdir -p PathUtil.java.html", "mkdir -p edu.hm.hafner.util/PathUtil.java.html");
-        //a = a.replace("rm -r PathUtil.java.html", "rm -r edu.hm.hafner.util/PathUtil.java.html");
-       // a = a.replace("&& base64", "&& mkdir edu.hm.hafner.util && base64");
-       // a = a.replace("> PathUtil.java.html ", "> edu.hm.hafner.util/PathUtil.java.html");
         String zipFile = job.copyResourceStep("/PitMutationTest/testdata.zip");
         zipFile += "\n sh '''unzip testdata.zip'''";
 
         job.script.set("node {\n" +
             zipFile + "\n" +
             job.copyResourceStep("/PitMutationTest/mutations.xml") + "\n" +
-            //a + "\n" +
             job.copyResourceStep("/PitMutationTest/edu.hm.hafner.util/PathUtil.java.html") + "\n" +
             "pitmutation killRatioMustImprove: false, minimumKillRatio: 50.0, mutationStatsFile: '**.xml'\n" +
             "}");
-
-        /*
-        * ZIP datei probieren und unpacken
-        * Plugin: Resource Plugin
-        * */
 
         job.save();
         return job;

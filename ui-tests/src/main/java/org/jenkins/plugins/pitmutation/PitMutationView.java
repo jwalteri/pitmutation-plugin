@@ -14,13 +14,14 @@ public class PitMutationView extends PageObject {
         super(parent, parent.url(id));
         this.open();
         this.dashboard = this.getElement(by.tagName("body"));
+
+
     }
 
     public PitMutationView(final Injector injector, final URL url, final String id) {
         super(injector, url);
     }
 
-    public String getConsoleOutput() {
-        return this.getElement(by.id("main-panel")).getText();
-    }
+
+
 }

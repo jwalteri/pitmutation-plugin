@@ -13,6 +13,7 @@ public class DashboardView extends PageObject {
     protected DashboardView(final Build parent, String id) {
         super(parent, parent.url(id));
         this.open();
+        //driver.navigate().refresh();
         this.dashboard = this.getElement(by.tagName("body"));
         this.id = id;
     }
@@ -41,8 +42,8 @@ public class DashboardView extends PageObject {
         return consoleOutput.get();
     }
 
-    public PitMutationView openPitMutationView () {
-        return openPage(getPitMutationLink(), PitMutationView.class);
+    public MutationTableView openPitMutationView () {
+        return openPage(getPitMutationLink(), MutationTableView.class);
     }
 
     public ConsoleView openConsoleView() {
