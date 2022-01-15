@@ -43,7 +43,7 @@ public class PitMutationTest extends UiTest {
 
         ComponentTable componentTable = mutationTableView.getComponentTable();
 
-        //assertThat(componentTable.getComponentTableEntries().size()).isEqualTo(9);
+        assertThat(componentTable.getComponentTableEntries().size()).isEqualTo(16);
 
         MutationTableView second = mutationTableView.clickRowLink(0);
         second.initialize();
