@@ -1,5 +1,6 @@
 package org.jenkins.plugins.pitmutation;
 
+import com.gargoylesoftware.htmlunit.Page;
 import com.google.inject.Injector;
 import org.jenkinsci.test.acceptance.po.Build;
 import org.jenkinsci.test.acceptance.po.PageObject;
@@ -15,6 +16,7 @@ public class MutationTableView extends PageObject {
     private WebElement componentsTable;
     private WebElement mutationTableView;
     private ComponentTable componentTable;
+    private WebElement hierarchyLevel;
     private MutationStatistics mutationStatistics;
 
     //TODO: Link Steps und Name!!!
@@ -38,17 +40,38 @@ public class MutationTableView extends PageObject {
         return mutationStatistics;
     }
 
-    public MutationTableView clickRowLink(int rowIndex) {
-        return openPage(componentTable.getComponentTableEntries().get(rowIndex).getClickable(), MutationTableView.class);
+    public PageObject clickRowLink(int rowIndex) {
+        /* TODO: Prüfe name von Entry of: != class
+            Wenn class: MutationDetailView
+            Wenn != class: MutationTableView
+        * */
+
+        String level = componentTable.getComponentTableEntries().get(rowIndex)
+            .getName();
+
+        if (level.contains("Class")) {
+            return openPage(componentTable.getComponentTableEntries()
+                .get(rowIndex).getClickable(), MutationDetailView.class);
+
+        } else {
+            return openPage(componentTable.getComponentTableEntries()
+                .get(rowIndex).getClickable(), MutationTableView.class);
+        }
     }
 
     public MutationTableView clickSorting(int colIndex) {
+        // TODO: durch Sortierung: neuladen der Daten -> Reihenfolge prüfbar machen
         return openPage(componentTable.getSorting().getHeaders().get(colIndex), MutationTableView.class);
+    }
+
+    private void extractHierarchyLevelName() {
+        hierarchyLevel = this.getElement(by.tagName("h1"));
     }
 
     public void initialize() {
         this.mutationTableView = this.getElement(by.tagName("body"));
         initializeTables();
+        extractHierarchyLevelName();
         mutationStatistics = new MutationStatistics(this.statisticsTable);
         componentTable = new ComponentTable(componentsTable);
     }

@@ -43,9 +43,9 @@ public class PitMutationTest extends UiTest {
 
         ComponentTable componentTable = mutationTableView.getComponentTable();
 
-        assertThat(componentTable.getComponentTableEntries().size()).isEqualTo(16);
+        assertThat(componentTable.getComponentTableEntries().size()).isEqualTo(1);
 
-        MutationTableView second = mutationTableView.clickRowLink(0);
+        MutationTableView second = (MutationTableView) mutationTableView.clickRowLink(0);
         second.initialize();
 
         MutationStatistics secondMutationStatistics = second.getMutationStatistics();
@@ -53,6 +53,12 @@ public class PitMutationTest extends UiTest {
 
         assertThat(secondMutationStatistics.getMutations().getName()).isEqualTo("Mutations");
         assertThat(secondComponentTable.getComponentTableEntries().size()).isEqualTo(16);
+
+        MutationTableView third = (MutationTableView) second.clickRowLink(15);
+        third.initialize();
+
+        MutationDetailView fourth = (MutationDetailView) third.clickRowLink(0);
+        fourth.initialize();
 
     }
 
