@@ -7,13 +7,10 @@ import org.openqa.selenium.WebElement;
 import java.util.Optional;
 
 public class DashboardView extends PageObject {
-    private String id;
 
     protected DashboardView(final Build parent, String id) {
         super(parent, parent.url(id));
         this.open();
-        //driver.navigate().refresh();
-        this.id = id;
     }
 
     private WebElement getBody() {

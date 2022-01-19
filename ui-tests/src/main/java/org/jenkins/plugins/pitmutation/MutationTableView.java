@@ -21,12 +21,10 @@ public class MutationTableView extends PageObject {
     protected MutationTableView(final Build parent, String id) {
         super(parent, parent.url(id));
         this.open();
-        //initialize();
     }
 
     public MutationTableView(final Injector injector, final URL url, final String id) {
         super(injector, url);
-        //initialize();
     }
 
     public ComponentTable getComponentTable() {
@@ -64,7 +62,6 @@ public class MutationTableView extends PageObject {
     }
 
     public MutationTableView clickSorting(int colIndex) {
-        // TODO: durch Sortierung: neuladen der Daten -> Reihenfolge prüfbar machen
         return openPage(componentTable.getSorting().getHeaders().get(colIndex), MutationTableView.class);
     }
 
