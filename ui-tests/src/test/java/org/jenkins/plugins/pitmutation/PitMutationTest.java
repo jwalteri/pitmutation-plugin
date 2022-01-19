@@ -6,14 +6,15 @@ import org.jenkinsci.test.acceptance.po.Job;
 import org.jenkinsci.test.acceptance.po.WorkflowJob;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.contentOf;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 
 @WithPlugins({"pitmutation", "pipeline-stage-step", "workflow-durable-task-step", "workflow-basic-steps",
     "workflow-job", "workflow-scm-step", "workflow-cps"})
 public class PitMutationTest extends UiTest {
 
-    //@Test
+    @Test
     public void BuildSuccessful() {
         Build build = createAndBuildWorkflowJob();
         ConsoleView consoleView = new ConsoleView(build, "console");
@@ -22,50 +23,81 @@ public class PitMutationTest extends UiTest {
         assertThat(consoleView.getConsoleOutput()).contains("Finished: SUCCESS");
     }
 
-    /*
-    *  ComponentTable componentTable = baseView.getComponentTable();
 
-        assertThat(componentTable.getComponentTableEntries().size()).isEqualTo(1);
-
-        MutationTableView second = (MutationTableView) baseView.clickRowLink(0);
-        second.initialize();
-
-        MutationStatistics secondMutationStatistics = second.getMutationStatistics();
-        ComponentTable secondComponentTable = second.getComponentTable();
-
-        assertThat(secondMutationStatistics.getMutations().getName()).isEqualTo("Mutations");
-        assertThat(secondComponentTable.getComponentTableEntries().size()).isEqualTo(16);
-
-        MutationTableView third = (MutationTableView) second.clickRowLink(15);
-        third.initialize();
-
-        MutationDetailView fourth = (MutationDetailView) third.clickRowLink(0);
-
-        fourth.initialize();
-
-        third = fourth.navigatePreviousPage();
-        third.initialize();
-
-        MutationTableView base = third.navigateHierarchyLevel(0);
-
-        assertThat(base.getMutationStatistics().getMutations().getName()).isEqualTo("Mutations");
-
-    * */
-
+    @Test
     public void testExamined() {
+        Build build = createAndBuildWorkflowJob();
 
+        DashboardView dashboardView = new DashboardView(build, "");
+
+        MutationTableView baseView = dashboardView.openPitMutationView();
+        baseView.initialize();
+
+        MutationTableView moduleView = (MutationTableView) baseView.clickRowLink(0);
+        moduleView.initialize();
+
+        MutationTableView packageView = (MutationTableView) moduleView.clickRowLink(15);
+        packageView.initialize();
+
+        MutationDetailView classView = (MutationDetailView) packageView.clickRowLink(0);
+        classView.initialize();
+
+        List<String> tests = classView.getTestsExamined();
+
+        assertThat(tests.size()).isEqualTo(21);
+        assertThat(tests.get(0)).contains("edu.hm.hafner.util.PathUtilTest", "shouldReturnFallbackOnError",
+            "[test-template-invocation:#3] (8 ms)");
     }
 
+    @Test
     public void verifyMutators() {
+        Build build = createAndBuildWorkflowJob();
 
+        DashboardView dashboardView = new DashboardView(build, "");
+
+        MutationTableView baseView = dashboardView.openPitMutationView();
+        baseView.initialize();
+
+        MutationTableView moduleView = (MutationTableView) baseView.clickRowLink(0);
+        moduleView.initialize();
+
+        MutationTableView packageView = (MutationTableView) moduleView.clickRowLink(15);
+        packageView.initialize();
+
+        MutationDetailView classView = (MutationDetailView) packageView.clickRowLink(0);
+        classView.initialize();
+
+        List<String> mutators = classView.getActiveMutators();
+
+        assertThat(mutators.size()).isEqualTo(11);
+        assertThat(mutators.get(0)).isEqualTo("CONDITIONALS_BOUNDARY");
     }
 
+    @Test
     public void verifyMutationInformation() {
+        Build build = createAndBuildWorkflowJob();
 
+        DashboardView dashboardView = new DashboardView(build, "");
+
+        MutationTableView baseView = dashboardView.openPitMutationView();
+        baseView.initialize();
+
+        MutationTableView moduleView = (MutationTableView) baseView.clickRowLink(0);
+        moduleView.initialize();
+
+        MutationTableView packageView = (MutationTableView) moduleView.clickRowLink(15);
+        packageView.initialize();
+
+        MutationDetailView classView = (MutationDetailView) packageView.clickRowLink(0);
+        classView.initialize();
+
+        MutationInformationTable informationTable = classView.getMutationInformation();
+        MutationInformationTableEntry entry = informationTable.getEntries().get("42");
+
+        assertThat(entry.getKey()).isEqualTo("42");
+        assertThat(entry.getMutationInformation()).contains("1.1", "Location : exists", "edu.hm.hafner.util.PathUtilTest",
+            "PathUtil::exists", "KILLED");
     }
-
-    //TODO: von oben nach unten und unten nach oben
-    //TODO: mutaturs und tests examined
 
     @Test
     public void verifySourceLink() {
@@ -89,13 +121,15 @@ public class PitMutationTest extends UiTest {
         MutationSourceTableEntry sourceEntry = sourceTable.getEntries().get("42");
 
         MutationInformationTable informationTable = classView.getMutationInformation();
-        //MutationInformationTableEntry informationEntry = informationTable.getEntries().get();
+        MutationInformationTableEntry informationEntry = informationTable.getEntries().get("42");
 
         String sourceLink = extractPageAnker(sourceEntry.getMutationInformationId().getAttribute("href"));
-        //String mutationLink = extractPageAnker()
+        String mutationLink = extractPageAnker(informationEntry.getClickable().getAttribute("href"));
+
+        assertThat(sourceLink).isEqualTo(mutationLink);
     }
 
-    //@Test
+    @Test
     public void verifySource() {
         Build build = createAndBuildWorkflowJob();
 
@@ -123,7 +157,7 @@ public class PitMutationTest extends UiTest {
         assertThat(extractPageAnker(entry.getMutationInformationId().getAttribute("href"))).isEqualTo("def930cd_42");
     }
 
-    //@Test
+    @Test
     public void verifyClassComponentLink() {
         Build build = createAndBuildWorkflowJob();
 
@@ -155,7 +189,7 @@ public class PitMutationTest extends UiTest {
         return link.substring(link.indexOf("@") + 1);
     }
 
-    //@Test
+    @Test
     public void verifySorting() {
         Build build = createAndBuildWorkflowJob();
 
@@ -183,7 +217,7 @@ public class PitMutationTest extends UiTest {
         assertLastClassComponentTableEntry(classTable.getComponentDetailTableEntries().get(0));
     }
 
-    //@Test
+    @Test
     public void verifyComponents() {
         Build build = createAndBuildWorkflowJob();
 
@@ -219,14 +253,14 @@ public class PitMutationTest extends UiTest {
     }
 
     private void assertLastClassComponentTableEntry(ComponentDetailTableEntry entry) {
-        assertThat(entry.getName()).isEqualTo("42");
-        assertThat(entry.getMutations()).isEqualTo("2");
-        assertThat(entry.getMutationsDelta()).isEqualTo("+ 2");
+        assertThat(entry.getName()).isEqualTo("275");
+        assertThat(entry.getMutations()).isEqualTo("1");
+        assertThat(entry.getMutationsDelta()).isEqualTo("+ 1");
         assertThat(entry.getUndetected()).isEqualTo("0");
         assertThat(entry.getUndetectedDelta()).isEqualTo("0");
         assertThat(entry.getCoverage()).isEqualTo("100.0%");
         assertThat(entry.getCoverageDelta()).isEqualTo("+100.0%");
-        assertThat(entry.getMutationDetail()).isEqualTo("BooleanTrueReturnVals BooleanFalseReturnVals ");
+        assertThat(entry.getMutationDetail()).contains("EmptyObjectReturnVals");
     }
 
     private void assertFirstClassComponentTableEntry(ComponentDetailTableEntry entry) {
@@ -237,7 +271,7 @@ public class PitMutationTest extends UiTest {
         assertThat(entry.getUndetectedDelta()).isEqualTo("0");
         assertThat(entry.getCoverage()).isEqualTo("100.0%");
         assertThat(entry.getCoverageDelta()).isEqualTo("+100.0%");
-        assertThat(entry.getMutationDetail()).isEqualTo("BooleanTrueReturnVals BooleanFalseReturnVals ");
+        assertThat(entry.getMutationDetail()).contains("BooleanTrueReturnVals BooleanFalseReturnVals ");
     }
 
 
@@ -261,7 +295,7 @@ public class PitMutationTest extends UiTest {
         assertThat(entry.getCoverageDelta()).isEqualTo("+90.476%");
     }
 
-    //@Test
+    @Test
     public void verifyMutationStatistics() {
         Build build = createAndBuildWorkflowJob();
 
@@ -306,7 +340,7 @@ public class PitMutationTest extends UiTest {
         assertThat(statistics.getCoverage().getValue()).isEqualTo("90.476% (+90.476%)");
     }
 
-    //@Test
+    @Test
     public void verifyMutationHierarchy() {
         Build build = createAndBuildWorkflowJob();
 

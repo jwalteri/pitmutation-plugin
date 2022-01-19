@@ -33,7 +33,7 @@ public class MutationInformationTable extends GenericUiTable<String, MutationInf
 
         return new MutationInformationTableEntry(
             tds.get(0).getText(),
-            tds.get(0),
+            tds.get(0).findElement(by.tagName("a")),
             tds.get(2).getText()
         );
     }
