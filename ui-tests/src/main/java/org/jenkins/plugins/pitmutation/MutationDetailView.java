@@ -20,6 +20,7 @@ public class MutationDetailView extends PageObject {
     private ComponentDetailTable componentDetail;
     private List<String> activeMutators;
     private List<String> testsExamined;
+    private MutationNavigation navigation;
 
     public MutationDetailView(Injector injector, URL url) {
         super(injector, url);
@@ -47,12 +48,17 @@ public class MutationDetailView extends PageObject {
         List<WebElement> uls = mutationDetailTableView.findElements(by.tagName("ul"));
         activeMutators = extractValuesFromUnorderedList(uls.get(2));
         testsExamined = extractValuesFromUnorderedList(uls.get(3));
+        navigation = new MutationNavigation(mutationDetailTableView);
     }
 
     private List<String> extractValuesFromUnorderedList(WebElement unorderedList) {
         List<WebElement> listEntry = unorderedList.findElements(by.tagName("li"));
 
         return listEntry.stream().map(WebElement::getText).collect(Collectors.toList());
+    }
+
+    public MutationNavigation getNavigation() {
+        return navigation;
     }
 
     public List<String> getActiveMutators() {
@@ -76,9 +82,19 @@ public class MutationDetailView extends PageObject {
         return null;
     }
 
-    public MutationTableView clickSorting(int colIndex) {
-        // TODO: durch Sortierung: neuladen der Daten -> Reihenfolge prüfbar machen
-        return openPage(componentDetail.getSorting().getHeaders().get(colIndex), MutationTableView.class);
+    public MutationTableView navigatePreviousPage() {
+        return openPage(navigation.getPrevious().getClickable(), MutationTableView.class);
+    }
+
+    public MutationTableView navigateHierarchyLevel(int level) {
+        if (!navigation.containsLevel(level)) {
+            throw new IllegalArgumentException("Navigation hierarchy level " + level + " not found!");
+        }
+        return openPage(navigation.getNavigationPoint(level).getClickable(), MutationTableView.class);
+    }
+
+    public MutationDetailView clickSorting(int colIndex) {
+        return openPage(componentDetail.getSorting().getHeaders().get(colIndex), MutationDetailView.class);
     }
 
     private void initializeTables() {

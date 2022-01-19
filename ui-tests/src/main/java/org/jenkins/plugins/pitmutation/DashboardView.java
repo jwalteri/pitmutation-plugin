@@ -7,19 +7,22 @@ import org.openqa.selenium.WebElement;
 import java.util.Optional;
 
 public class DashboardView extends PageObject {
-    private WebElement dashboard;
     private String id;
 
     protected DashboardView(final Build parent, String id) {
         super(parent, parent.url(id));
         this.open();
         //driver.navigate().refresh();
-        this.dashboard = this.getElement(by.tagName("body"));
         this.id = id;
     }
 
+    private WebElement getBody() {
+        return this.getElement(by.tagName("body"));
+    }
+
     private WebElement getPitMutationLink() {
-        Optional<WebElement> consoleOutput = this.dashboard.findElements(by.tagName("a")).stream()
+        driver.navigate().refresh();
+        Optional<WebElement> consoleOutput = getBody().findElements(by.tagName("a")).stream()
             .filter(x -> x.getText().contains("PIT Mutation Report"))
             .findFirst();
 
@@ -31,7 +34,8 @@ public class DashboardView extends PageObject {
     }
 
     private WebElement getConsoleOutputLink() {
-        Optional<WebElement> consoleOutput = this.dashboard.findElements(by.tagName("a")).stream()
+        driver.navigate().refresh();
+        Optional<WebElement> consoleOutput = getBody().findElements(by.tagName("a")).stream()
             .filter(x -> x.getText().contains("Console Output"))
             .findFirst();
 
@@ -52,7 +56,7 @@ public class DashboardView extends PageObject {
 
     private <T extends PageObject> T openPage(final WebElement link, final Class<T> type) {
         String href = link.getAttribute("href");
-        T result = newInstance(type, injector, url(href), id);
+        T result = newInstance(type, injector, url(href), "");
         link.click();
 
         return result;

@@ -7,7 +7,6 @@ import org.openqa.selenium.WebElement;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
@@ -22,10 +21,12 @@ public class MutationTableView extends PageObject {
     protected MutationTableView(final Build parent, String id) {
         super(parent, parent.url(id));
         this.open();
+        //initialize();
     }
 
     public MutationTableView(final Injector injector, final URL url, final String id) {
         super(injector, url);
+        //initialize();
     }
 
     public ComponentTable getComponentTable() {
@@ -37,7 +38,7 @@ public class MutationTableView extends PageObject {
     }
 
     public PageObject clickRowLink(int rowIndex) {
-        if (Objects.equals(navigation.getCurrentLevel(), MutationNavigation.NavigationHierarchy.MODULES.getValue())) {
+        if (navigation.getCurrentLevel().equals(MutationNavigation.NavigationHierarchy.PACKAGE.getValue().toUpperCase())) {
             return openPage(componentTable.getComponentTableEntries()
                 .get(rowIndex).getClickable(), MutationDetailView.class);
 
@@ -45,6 +46,10 @@ public class MutationTableView extends PageObject {
             return openPage(componentTable.getComponentTableEntries()
                 .get(rowIndex).getClickable(), MutationTableView.class);
         }
+    }
+
+    public MutationNavigation getNavigation() {
+        return navigation;
     }
 
     public MutationTableView navigatePreviousPage() {
