@@ -1,6 +1,5 @@
 package org.jenkins.plugins.pitmutation;
 
-import com.gargoylesoftware.htmlunit.Page;
 import com.google.inject.Injector;
 import org.jenkinsci.test.acceptance.po.Build;
 import org.jenkinsci.test.acceptance.po.PageObject;
@@ -8,6 +7,7 @@ import org.openqa.selenium.WebElement;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
@@ -16,20 +16,16 @@ public class MutationTableView extends PageObject {
     private WebElement componentsTable;
     private WebElement mutationTableView;
     private ComponentTable componentTable;
-    private WebElement hierarchyLevel;
     private MutationStatistics mutationStatistics;
-
-    //TODO: Link Steps und Name!!!
+    private MutationNavigation navigation;
 
     protected MutationTableView(final Build parent, String id) {
         super(parent, parent.url(id));
         this.open();
-        //initialize();
     }
 
     public MutationTableView(final Injector injector, final URL url, final String id) {
         super(injector, url);
-        //initialize();
     }
 
     public ComponentTable getComponentTable() {
@@ -41,15 +37,7 @@ public class MutationTableView extends PageObject {
     }
 
     public PageObject clickRowLink(int rowIndex) {
-        /* TODO: Prüfe name von Entry of: != class
-            Wenn class: MutationDetailView
-            Wenn != class: MutationTableView
-        * */
-
-        String level = componentTable.getComponentTableEntries().get(rowIndex)
-            .getName();
-
-        if (level.contains("Class")) {
+        if (Objects.equals(navigation.getCurrentLevel(), MutationNavigation.NavigationHierarchy.MODULES.getValue())) {
             return openPage(componentTable.getComponentTableEntries()
                 .get(rowIndex).getClickable(), MutationDetailView.class);
 
@@ -59,21 +47,28 @@ public class MutationTableView extends PageObject {
         }
     }
 
+    public MutationTableView navigatePreviousPage() {
+        return openPage(navigation.getPrevious().getClickable(), MutationTableView.class);
+    }
+
+    public MutationTableView navigateHierarchyLevel(int level) {
+        if (!navigation.containsLevel(level)) {
+            throw new IllegalArgumentException("Navigation hierarchy level " + level + " not found!");
+        }
+        return openPage(navigation.getNavigationPoint(level).getClickable(), MutationTableView.class);
+    }
+
     public MutationTableView clickSorting(int colIndex) {
         // TODO: durch Sortierung: neuladen der Daten -> Reihenfolge prüfbar machen
         return openPage(componentTable.getSorting().getHeaders().get(colIndex), MutationTableView.class);
     }
 
-    private void extractHierarchyLevelName() {
-        hierarchyLevel = this.getElement(by.tagName("h1"));
-    }
-
     public void initialize() {
         this.mutationTableView = this.getElement(by.tagName("body"));
         initializeTables();
-        extractHierarchyLevelName();
         mutationStatistics = new MutationStatistics(this.statisticsTable);
         componentTable = new ComponentTable(componentsTable);
+        navigation = new MutationNavigation(mutationTableView);
     }
 
     private void initializeTables() {
