@@ -1,4 +1,4 @@
-package org.jenkins.plugins.pitmutation;
+package org.jenkins.plugins.pitmutation.Views;
 
 import com.google.inject.Injector;
 import org.jenkinsci.test.acceptance.po.Build;
@@ -26,7 +26,6 @@ public class ConsoleView extends PageObject {
     }
 
     public String getConsoleOutput() {
-        //return this.getElement(by.id("main-panel")).getText();
        return this.find(by.id("main-panel")).getText();
     }
 }

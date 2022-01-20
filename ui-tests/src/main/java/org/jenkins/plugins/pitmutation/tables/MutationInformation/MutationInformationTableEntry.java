@@ -1,19 +1,14 @@
-package org.jenkins.plugins.pitmutation;
+package org.jenkins.plugins.pitmutation.tables.MutationInformation;
 
+import org.jenkins.plugins.pitmutation.tables.AbstractMapEntry;
 import org.openqa.selenium.WebElement;
 
-public class MutationInformationTableEntry extends GenericUiTableEntry<String> {
-    private final WebElement clickable;
+public class MutationInformationTableEntry extends AbstractMapEntry<String> {
     private final String mutationInformation;
 
     public MutationInformationTableEntry(String key, WebElement clickable, String mutationInformation) {
-        super(key);
-        this.clickable = clickable;
+        super(clickable,key);
         this.mutationInformation = mutationInformation;
-    }
-
-    public WebElement getClickable() {
-        return clickable;
     }
 
     public String getMutationInformation() {

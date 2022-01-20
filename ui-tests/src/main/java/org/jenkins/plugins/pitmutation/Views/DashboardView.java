@@ -1,5 +1,6 @@
-package org.jenkins.plugins.pitmutation;
+package org.jenkins.plugins.pitmutation.Views;
 
+import org.jenkins.plugins.pitmutation.Views.PitMutation.MutationTableView;
 import org.jenkinsci.test.acceptance.po.Build;
 import org.jenkinsci.test.acceptance.po.PageObject;
 import org.openqa.selenium.WebElement;
@@ -8,7 +9,7 @@ import java.util.Optional;
 
 public class DashboardView extends PageObject {
 
-    protected DashboardView(final Build parent, String id) {
+    public DashboardView(final Build parent, String id) {
         super(parent, parent.url(id));
         this.open();
     }

@@ -1,11 +1,11 @@
-package org.jenkins.plugins.pitmutation;
+package org.jenkins.plugins.pitmutation.tables.Components;
 
+import org.jenkins.plugins.pitmutation.tables.AbstractTableEntry;
 import org.openqa.selenium.WebElement;
 
-public class ComponentTableEntry {
+public class ComponentTableEntry extends AbstractTableEntry {
     private final String name;
     private final String link;
-    private final WebElement clickable;
     private final String mutations;
     private final String mutationsDelta;
     private final String undetected;
@@ -16,19 +16,15 @@ public class ComponentTableEntry {
     public ComponentTableEntry(String name, String link, WebElement clickable, String mutations, String mutationsDelta,
                                String undetected, String undetectedDelta, String coverage,
                                String coverageDelta) {
+        super(clickable);
         this.name = name;
         this.link = link;
-        this.clickable = clickable;
         this.mutations = mutations;
         this.mutationsDelta = mutationsDelta;
         this.undetected = undetected;
         this.undetectedDelta = undetectedDelta;
         this.coverage = coverage;
         this.coverageDelta = coverageDelta;
-    }
-
-    public WebElement getClickable() {
-        return clickable;
     }
 
     public String getLink() {

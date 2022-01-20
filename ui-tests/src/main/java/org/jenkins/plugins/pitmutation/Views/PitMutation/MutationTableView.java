@@ -1,6 +1,8 @@
-package org.jenkins.plugins.pitmutation;
+package org.jenkins.plugins.pitmutation.Views.PitMutation;
 
 import com.google.inject.Injector;
+import org.jenkins.plugins.pitmutation.Views.MutationDetailView;
+import org.jenkins.plugins.pitmutation.tables.Components.ComponentTable;
 import org.jenkinsci.test.acceptance.po.Build;
 import org.jenkinsci.test.acceptance.po.PageObject;
 import org.openqa.selenium.WebElement;
@@ -37,11 +39,11 @@ public class MutationTableView extends PageObject {
 
     public PageObject clickRowLink(int rowIndex) {
         if (navigation.getCurrentLevel().equals(MutationNavigation.NavigationHierarchy.PACKAGE.getValue().toUpperCase())) {
-            return openPage(componentTable.getComponentTableEntries()
+            return openPage(componentTable.getDataEntries()
                 .get(rowIndex).getClickable(), MutationDetailView.class);
 
         } else {
-            return openPage(componentTable.getComponentTableEntries()
+            return openPage(componentTable.getDataEntries()
                 .get(rowIndex).getClickable(), MutationTableView.class);
         }
     }

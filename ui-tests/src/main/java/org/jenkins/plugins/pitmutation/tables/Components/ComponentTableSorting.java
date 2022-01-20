@@ -1,11 +1,11 @@
-package org.jenkins.plugins.pitmutation;
+package org.jenkins.plugins.pitmutation.tables.Components;
 
+import org.jenkins.plugins.pitmutation.tables.AbstractTableSorting;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
-public class ComponentTableSorting {
+public class ComponentTableSorting extends AbstractTableSorting {
     private final WebElement name;
     private final WebElement mutations;
     private final WebElement mutationsDelta;
@@ -13,12 +13,12 @@ public class ComponentTableSorting {
     private final WebElement undetectedDelta;
     private final WebElement coverage;
     private final WebElement coverageDelta;
-    private List<WebElement> headers;
 
     public ComponentTableSorting(WebElement name, WebElement mutations,
                                  WebElement mutationsDelta, WebElement undetected,
                                  WebElement undetectedDelta, WebElement coverage,
                                  WebElement coverageDelta) {
+        super(Arrays.asList(name, mutations, mutationsDelta, undetected, undetectedDelta, coverage, coverageDelta));
         this.name = name;
         this.mutations = mutations;
         this.mutationsDelta = mutationsDelta;
@@ -26,22 +26,7 @@ public class ComponentTableSorting {
         this.undetectedDelta = undetectedDelta;
         this.coverage = coverage;
         this.coverageDelta = coverageDelta;
-        headers = new ArrayList<>();
-        headers.add(name);
-        headers.add(mutations);
-        headers.add(mutationsDelta);
-        headers.add(undetected);
-        headers.add(undetectedDelta);
-        headers.add(coverage);
-        headers.add(coverageDelta);
-    }
 
-    public void setHeaders(List<WebElement> headers) {
-        this.headers = headers;
-    }
-
-    public List<WebElement> getHeaders() {
-        return headers;
     }
 
     public WebElement getName() {

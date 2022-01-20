@@ -1,6 +1,12 @@
-package org.jenkins.plugins.pitmutation;
+package org.jenkins.plugins.pitmutation.Views;
 
 import com.google.inject.Injector;
+import org.jenkins.plugins.pitmutation.Views.PitMutation.MutationNavigation;
+import org.jenkins.plugins.pitmutation.Views.PitMutation.MutationStatistics;
+import org.jenkins.plugins.pitmutation.Views.PitMutation.MutationTableView;
+import org.jenkins.plugins.pitmutation.tables.ClassComponents.ClassComponentTable;
+import org.jenkins.plugins.pitmutation.tables.MutationInformation.MutationInformationTable;
+import org.jenkins.plugins.pitmutation.tables.MutationSource.MutationSourceTable;
 import org.jenkinsci.test.acceptance.po.PageObject;
 import org.openqa.selenium.WebElement;
 
@@ -17,7 +23,7 @@ public class MutationDetailView extends PageObject {
     private MutationInformationTable mutationInformation;
     private MutationSourceTable mutationSource;
     private MutationStatistics mutationStatistics;
-    private ComponentDetailTable componentDetail;
+    private ClassComponentTable componentDetail;
     private List<String> activeMutators;
     private List<String> testsExamined;
     private MutationNavigation navigation;
@@ -43,7 +49,7 @@ public class MutationDetailView extends PageObject {
         this.mutationDetailTableView = this.getElement(by.tagName("body"));
         initializeTables();
         mutationStatistics = new MutationStatistics(this.statisticsTable);
-        componentDetail = new ComponentDetailTable(componentsDetailTable);
+        componentDetail = new ClassComponentTable(componentsDetailTable);
 
         List<WebElement> uls = mutationDetailTableView.findElements(by.tagName("ul"));
         activeMutators = extractValuesFromUnorderedList(uls.get(2));
@@ -69,7 +75,7 @@ public class MutationDetailView extends PageObject {
         return testsExamined;
     }
 
-    public ComponentDetailTable getComponentDetailTable() {
+    public ClassComponentTable getComponentDetailTable() {
         return componentDetail;
     }
 

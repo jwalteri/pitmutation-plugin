@@ -1,4 +1,4 @@
-package org.jenkins.plugins.pitmutation;
+package org.jenkins.plugins.pitmutation.Views.PitMutation;
 
 import org.openqa.selenium.WebElement;
 
