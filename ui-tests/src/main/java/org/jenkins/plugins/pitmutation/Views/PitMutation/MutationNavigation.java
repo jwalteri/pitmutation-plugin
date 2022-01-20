@@ -1,57 +1,26 @@
 package org.jenkins.plugins.pitmutation.Views.PitMutation;
 
+import org.jenkins.plugins.pitmutation.WebElementUtils;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.jenkinsci.test.acceptance.Matchers.by;
-
-public class MutationNavigation {
-    private final List<MutationNavigationPoint> navigationPoints;
-    private final String currentLevel;
+public class MutationNavigation extends AbstractNavigation<MutationNavigation.MutationNavigationPoint> {
 
     public MutationNavigation(WebElement body) {
-        WebElement mainPanel = body.findElement(by.id("main-panel"));
+        WebElement mainPanel = WebElementUtils.getById(body, WebElementUtils.MAIN_PANEL_ID);
 
         currentLevel = getHierarchyLevel(mainPanel);
         NavigationHierarchy hierarchy = NavigationHierarchy.valueOf(currentLevel);
 
-        List<WebElement> links = mainPanel.findElements(by.tagName("a"));
+        List<WebElement> links = WebElementUtils.getByTagName(mainPanel, WebElementUtils.LINK_TAG);
 
         List<WebElement> hierarchyLevels = links.subList(1, hierarchy.getDepth() + 1);
 
         navigationPoints = hierarchyLevels.stream()
             .map(MutationNavigationPoint::new)
             .collect(Collectors.toList());
-    }
-
-    public String getCurrentLevel() {
-        return currentLevel;
-    }
-
-    public List<MutationNavigationPoint> getNavigationPoints() {
-        return navigationPoints;
-    }
-
-    public boolean containsLevel(int level) {
-        return level < navigationPoints.size() - 1;
-    }
-
-    public MutationNavigationPoint getNavigationPoint(int level) {
-        return navigationPoints.size() > 0 ? navigationPoints.get(level) : null;
-    }
-
-    public MutationNavigationPoint getPrevious() {
-        return getNavigationPoint(navigationPoints.size() - 1);
-    }
-
-    private String getHierarchyLevel(WebElement mainPanel) {
-        String hierarchyLevel = mainPanel.findElement(by.tagName("h1")).getText();
-        if (hierarchyLevel.contains(":")) {
-            hierarchyLevel = hierarchyLevel.substring(0, hierarchyLevel.indexOf(":"));
-        }
-        return hierarchyLevel.toUpperCase();
     }
 
     public static class MutationNavigationPoint {
@@ -94,4 +63,5 @@ public class MutationNavigation {
             return value;
         }
     }
+
 }

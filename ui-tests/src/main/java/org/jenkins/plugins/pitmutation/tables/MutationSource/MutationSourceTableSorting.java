@@ -3,6 +3,9 @@ package org.jenkins.plugins.pitmutation.tables.MutationSource;
 import org.jenkins.plugins.pitmutation.tables.Components.ComponentTableSorting;
 import org.openqa.selenium.WebElement;
 
+/**
+ * 
+ */
 public class MutationSourceTableSorting extends ComponentTableSorting {
     private final WebElement mutationDetail;
 

@@ -3,11 +3,11 @@ package org.jenkins.plugins.pitmutation.Views;
 import com.google.inject.Injector;
 import org.jenkins.plugins.pitmutation.Views.PitMutation.MutationNavigation;
 import org.jenkins.plugins.pitmutation.Views.PitMutation.MutationStatistics;
-import org.jenkins.plugins.pitmutation.Views.PitMutation.MutationTableView;
+import org.jenkins.plugins.pitmutation.WebElementUtils;
 import org.jenkins.plugins.pitmutation.tables.ClassComponents.ClassComponentTable;
 import org.jenkins.plugins.pitmutation.tables.MutationInformation.MutationInformationTable;
 import org.jenkins.plugins.pitmutation.tables.MutationSource.MutationSourceTable;
-import org.jenkinsci.test.acceptance.po.PageObject;
+import org.jenkinsci.test.acceptance.po.Build;
 import org.openqa.selenium.WebElement;
 
 import java.net.URL;
@@ -16,7 +16,7 @@ import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class MutationDetailView extends PageObject {
+public class MutationDetailView extends AbstractView {
     private WebElement mutationDetailTableView;
     private WebElement statisticsTable;
     private WebElement componentsDetailTable;
@@ -28,13 +28,12 @@ public class MutationDetailView extends PageObject {
     private List<String> testsExamined;
     private MutationNavigation navigation;
 
-    public MutationDetailView(Injector injector, URL url) {
-        super(injector, url);
-        this.open();
+    public MutationDetailView(Build parent, String id) {
+        super(parent, id);
     }
 
     public MutationDetailView(final Injector injector, final URL url, final String id) {
-        super(injector, url);
+        super(injector, url, id);
     }
 
     public MutationInformationTable getMutationInformation() {
@@ -45,20 +44,21 @@ public class MutationDetailView extends PageObject {
         return mutationSource;
     }
 
+    @Override
     public void initialize() {
-        this.mutationDetailTableView = this.getElement(by.tagName("body"));
+        this.mutationDetailTableView = getBody();
         initializeTables();
         mutationStatistics = new MutationStatistics(this.statisticsTable);
         componentDetail = new ClassComponentTable(componentsDetailTable);
 
-        List<WebElement> uls = mutationDetailTableView.findElements(by.tagName("ul"));
+        List<WebElement> uls = WebElementUtils.getByTagName(mutationDetailTableView, WebElementUtils.UL_TAG);
         activeMutators = extractValuesFromUnorderedList(uls.get(2));
         testsExamined = extractValuesFromUnorderedList(uls.get(3));
         navigation = new MutationNavigation(mutationDetailTableView);
     }
 
     private List<String> extractValuesFromUnorderedList(WebElement unorderedList) {
-        List<WebElement> listEntry = unorderedList.findElements(by.tagName("li"));
+        List<WebElement> listEntry = WebElementUtils.getByTagName(unorderedList, WebElementUtils.LI_TAG);
 
         return listEntry.stream().map(WebElement::getText).collect(Collectors.toList());
     }
@@ -83,11 +83,6 @@ public class MutationDetailView extends PageObject {
         return mutationStatistics;
     }
 
-    public PageObject clickRowLink(int rowIndex) {
-        // TODO: todo
-        return null;
-    }
-
     public MutationTableView navigatePreviousPage() {
         return openPage(navigation.getPrevious().getClickable(), MutationTableView.class);
     }
@@ -104,7 +99,7 @@ public class MutationDetailView extends PageObject {
     }
 
     private void initializeTables() {
-        List<WebElement> tables = this.mutationDetailTableView.findElements(by.tagName("table"));
+        List<WebElement> tables = WebElementUtils.getByTagName(mutationDetailTableView, WebElementUtils.TABLE_TAG);
 
         OptionalInt componentsIndexOpt = IntStream.range(0, tables.size())
             .filter(x -> tables.get(x).getAttribute("class").equals("pane sortable"))
@@ -127,9 +122,9 @@ public class MutationDetailView extends PageObject {
 
         // Splitte mutationSourceTable
 
-        List<WebElement> trs = mutationSourceTable.findElements(by.tagName("tr"));
+        List<WebElement> trs = WebElementUtils.getByTagName(mutationSourceTable, WebElementUtils.ROW_TAG);
         OptionalInt splitterCell = IntStream.range(0, trs.size())
-            .filter(x -> trs.get(x).findElements(by.tagName("td")).get(0).getText()
+            .filter(x -> WebElementUtils.getByTagName(trs.get(x), WebElementUtils.TD_TAG).get(0).getText()
                 .isEmpty())
             .findFirst();
 
@@ -144,13 +139,5 @@ public class MutationDetailView extends PageObject {
 
         mutationInformation = new MutationInformationTable(rowsForInformation);
         mutationSource = new MutationSourceTable(rowsForSource);
-    }
-
-    private <T extends PageObject> T openPage(final WebElement link, final Class<T> type) {
-        String href = link.getAttribute("href");
-        T result = newInstance(type, injector, url(href), "");
-        link.click();
-
-        return result;
     }
 }

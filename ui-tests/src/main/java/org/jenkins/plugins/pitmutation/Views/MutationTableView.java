@@ -1,7 +1,9 @@
-package org.jenkins.plugins.pitmutation.Views.PitMutation;
+package org.jenkins.plugins.pitmutation.Views;
 
 import com.google.inject.Injector;
-import org.jenkins.plugins.pitmutation.Views.MutationDetailView;
+import org.jenkins.plugins.pitmutation.Views.PitMutation.MutationNavigation;
+import org.jenkins.plugins.pitmutation.Views.PitMutation.MutationStatistics;
+import org.jenkins.plugins.pitmutation.WebElementUtils;
 import org.jenkins.plugins.pitmutation.tables.Components.ComponentTable;
 import org.jenkinsci.test.acceptance.po.Build;
 import org.jenkinsci.test.acceptance.po.PageObject;
@@ -12,7 +14,7 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
-public class MutationTableView extends PageObject {
+public class MutationTableView extends AbstractView {
     private WebElement statisticsTable;
     private WebElement componentsTable;
     private WebElement mutationTableView;
@@ -21,12 +23,12 @@ public class MutationTableView extends PageObject {
     private MutationNavigation navigation;
 
     protected MutationTableView(final Build parent, String id) {
-        super(parent, parent.url(id));
+        super(parent, id);
         this.open();
     }
 
     public MutationTableView(final Injector injector, final URL url, final String id) {
-        super(injector, url);
+        super(injector, url, id);
     }
 
     public ComponentTable getComponentTable() {
@@ -67,8 +69,9 @@ public class MutationTableView extends PageObject {
         return openPage(componentTable.getSorting().getHeaders().get(colIndex), MutationTableView.class);
     }
 
+    @Override
     public void initialize() {
-        this.mutationTableView = this.getElement(by.tagName("body"));
+        this.mutationTableView = getBody();
         initializeTables();
         mutationStatistics = new MutationStatistics(this.statisticsTable);
         componentTable = new ComponentTable(componentsTable);
@@ -76,7 +79,7 @@ public class MutationTableView extends PageObject {
     }
 
     private void initializeTables() {
-        List<WebElement> tables = this.mutationTableView.findElements(by.tagName("table"));
+        List<WebElement> tables = WebElementUtils.getByTagName(mutationTableView, WebElementUtils.TABLE_TAG);
 
         OptionalInt componentsIndexOpt = IntStream.range(0, tables.size())
             .filter(x -> tables.get(x).getAttribute("class").equals("pane sortable"))
@@ -90,13 +93,5 @@ public class MutationTableView extends PageObject {
 
         this.componentsTable = tables.get(componentsIndex);
         this.statisticsTable = tables.get(1 - componentsIndex);
-    }
-
-    private <T extends PageObject> T openPage(final WebElement link, final Class<T> type) {
-        String href = link.getAttribute("href");
-        T result = newInstance(type, injector, url(href), "");
-        link.click();
-
-        return result;
     }
 }

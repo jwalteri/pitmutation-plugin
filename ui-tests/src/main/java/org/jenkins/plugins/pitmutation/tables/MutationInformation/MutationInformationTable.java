@@ -5,12 +5,21 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+/**
+ * Represents a mutation information table.
+ */
 public class MutationInformationTable extends AbstractMapTable<String, MutationInformationTableEntry> {
 
+    /**
+     * Ctor for MutationInformationTable.
+     *
+     * @param mutationInformationRows
+     */
     public MutationInformationTable(List<WebElement> mutationInformationRows) {
         readData(mutationInformationRows);
     }
 
+    @Override
     protected MutationInformationTableEntry rowToEntry(WebElement row) {
         List<WebElement> tds = getTableCells(row);
 

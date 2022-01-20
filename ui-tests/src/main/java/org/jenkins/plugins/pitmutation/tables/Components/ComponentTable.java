@@ -5,15 +5,27 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+/**
+ * Represents a component table.
+ */
 public class ComponentTable extends AbstractListTable<ComponentTableEntry> {
 
+    /**
+     * Ctor for ComponenTable.
+     *
+     * @param componentsTable WebElement of the corresponding component table.
+     */
     public ComponentTable(WebElement componentsTable) {
-
         List<WebElement> rows = getRows(componentsTable);
         readComponentTableHeader(rows);
         readComponentTableData(rows);
     }
 
+    /**
+     * Reads the table headers of the table. Interprets the first row as table header row.
+     *
+     * @param rows The table rows.
+     */
     private void readComponentTableHeader(List<WebElement> rows) {
         if (!rows.isEmpty()) {
             List<WebElement> headers = getTableHeaders(rows.get(0));
@@ -29,6 +41,11 @@ public class ComponentTable extends AbstractListTable<ComponentTableEntry> {
         }
     }
 
+    /**
+     * Reads the data of the table. Interprets the first row as table header row and so removes it.
+     *
+     * @param rows The table rows.
+     */
     private void readComponentTableData(List<WebElement> rows)  {
         rows.remove(0);
         for (WebElement row : rows) {

@@ -27,6 +27,10 @@ public abstract class AbstractTable {
         return tableCell.findElement(by.tagName(LINK_TAG));
     }
 
+    private List<WebElement> getByTagName(WebElement row, String tagName) {
+        return row.findElements(by.tagName(tagName));
+    }
+
     protected String getLinkTarget(WebElement container) {
         return getLink(container).getAttribute(LINK_TARGET_ATTRIBUTE);
     }
@@ -39,8 +43,5 @@ public abstract class AbstractTable {
         return getByTagName(dataRow, TABLE_DATA_TAG);
     }
 
-    private List<WebElement> getByTagName(WebElement row, String tagName) {
-        return row.findElements(by.tagName(tagName));
-    }
 
 }

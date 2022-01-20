@@ -5,12 +5,20 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+/**
+ * Represents a mutation source table.
+ */
 public class MutationSourceTable extends AbstractMapTable<String, MutationSourceTableEntry> {
 
+    /**
+     * Ctor for MutationSourceTable.
+     * @param mutationSourceRows The data rows.
+     */
     public MutationSourceTable(List<WebElement> mutationSourceRows) {
         readData(mutationSourceRows);
     }
 
+    @Override
     protected MutationSourceTableEntry rowToEntry(WebElement row) {
         List<WebElement> tds = getTableCells(row);
 
