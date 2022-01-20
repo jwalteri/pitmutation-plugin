@@ -6,12 +6,20 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Represents the navigation of the PitMutation Plugin site.
+ */
 public class MutationNavigation extends AbstractNavigation<MutationNavigation.MutationNavigationPoint> {
 
+    /**
+     * Ctor for MutationNavigation.
+     *
+     * @param body The body of the PitMutation Plugin.
+     */
     public MutationNavigation(WebElement body) {
         WebElement mainPanel = WebElementUtils.getById(body, WebElementUtils.MAIN_PANEL_ID);
 
-        currentLevel = getHierarchyLevel(mainPanel);
+        currentLevel = readHierarchyLevel(mainPanel);
         NavigationHierarchy hierarchy = NavigationHierarchy.valueOf(currentLevel);
 
         List<WebElement> links = WebElementUtils.getByTagName(mainPanel, WebElementUtils.LINK_TAG);
@@ -23,24 +31,44 @@ public class MutationNavigation extends AbstractNavigation<MutationNavigation.Mu
             .collect(Collectors.toList());
     }
 
+    /**
+     * Represents navigation points of the PitMutation Plugin site.
+     */
     public static class MutationNavigationPoint {
         private final WebElement clickable;
         private final String name;
 
+        /**
+         * Ctor for MutationNavigationPoint.
+         *
+         * @param clickable The clickable element of the navigation point.
+         */
         public MutationNavigationPoint(WebElement clickable) {
             this.clickable = clickable;
             this.name = this.clickable.getText();
         }
 
+        /**
+         * Returns the clickable element of the navigation point.
+         *
+         * @return The clickable element of the navigation point.
+         */
         public WebElement getClickable() {
             return clickable;
         }
 
+        /**
+         * Returns the name of the navigation point.
+         * @return The name of the navigation point.
+         */
         public String getName() {
             return name;
         }
     }
 
+    /**
+     * Represents the hierarchy levels of the PitMutation Plugin site.
+     */
     public enum NavigationHierarchy {
         MODULES("Modules", 0),
         MODULE("Module", 1),
@@ -50,15 +78,30 @@ public class MutationNavigation extends AbstractNavigation<MutationNavigation.Mu
         private final String value;
         private final int depth;
 
+        /**
+         * Ctor for NavigationHierarchy.
+         * @param value The value.
+         * @param depth The navigation depth.
+         */
         NavigationHierarchy(String value, int depth) {
             this.value = value;
             this.depth = depth;
         }
 
+        /**
+         * Returns the depth.
+         *
+         * @return The depth.
+         */
         public int getDepth() {
             return depth;
         }
 
+        /**
+         * Returns the value.
+         *
+         * @return The value.
+         */
         public String getValue() {
             return value;
         }

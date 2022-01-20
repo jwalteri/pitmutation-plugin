@@ -1,5 +1,6 @@
 package org.jenkins.plugins.pitmutation.tables.ClassComponents;
 
+import org.jenkins.plugins.pitmutation.WebElementUtils;
 import org.jenkins.plugins.pitmutation.tables.AbstractListTable;
 import org.openqa.selenium.WebElement;
 
@@ -16,7 +17,7 @@ public class ClassComponentTable extends AbstractListTable<ClassComponentTableEn
      * @param componentsTable WebElement of the corresponding component table.
      */
     public ClassComponentTable(WebElement componentsTable) {
-        List<WebElement> rows = getRows(componentsTable);
+        List<WebElement> rows = WebElementUtils.getByTagName(componentsTable, WebElementUtils.TR_TAG);
         readComponentTableHeader(rows);
         readComponentTableData(rows);
     }
@@ -28,16 +29,16 @@ public class ClassComponentTable extends AbstractListTable<ClassComponentTableEn
      */
     private void readComponentTableHeader(List<WebElement> rows) {
         if (!rows.isEmpty()) {
-            List<WebElement> headers = getTableHeaders(rows.get(0));
+            List<WebElement> headers = WebElementUtils.getByTagName(rows.get(0), WebElementUtils.TH_TAG);
             sorting = new ClassComponentTableSorting(
-                getLink(headers.get(0)),
-                getLink(headers.get(1)),
-                getLink(headers.get(2)),
-                getLink(headers.get(3)),
-                getLink(headers.get(4)),
-                getLink(headers.get(5)),
-                getLink(headers.get(6)),
-                getLink(headers.get(7))
+                WebElementUtils.getLink(headers.get(0)),
+                WebElementUtils.getLink(headers.get(1)),
+                WebElementUtils.getLink(headers.get(2)),
+                WebElementUtils.getLink(headers.get(3)),
+                WebElementUtils.getLink(headers.get(4)),
+                WebElementUtils.getLink(headers.get(5)),
+                WebElementUtils.getLink(headers.get(6)),
+                WebElementUtils.getLink(headers.get(7))
             );
         }
     }
@@ -50,13 +51,13 @@ public class ClassComponentTable extends AbstractListTable<ClassComponentTableEn
     private void readComponentTableData(List<WebElement> rows)  {
         rows.remove(0);
         for (WebElement row : rows) {
-            List<WebElement> tds = getTableCells(row);
+            List<WebElement> tds = WebElementUtils.getByTagName(row, WebElementUtils.TD_TAG);
 
             if (!tds.isEmpty()) {
                 dataEntries.add(new ClassComponentTableEntry(
                     tds.get(0).getText(),
-                    getLinkTarget(row),
-                    getLink(row),
+                    WebElementUtils.getAttribute(WebElementUtils.getLink(row), WebElementUtils.LINK_ATTRIBUTE),
+                    WebElementUtils.getLink(row),
                     tds.get(1).getText(),
                     tds.get(2).getText(),
                     tds.get(3).getText(),

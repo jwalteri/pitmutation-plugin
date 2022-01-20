@@ -122,7 +122,7 @@ public class MutationDetailView extends AbstractView {
 
         // Splitte mutationSourceTable
 
-        List<WebElement> trs = WebElementUtils.getByTagName(mutationSourceTable, WebElementUtils.ROW_TAG);
+        List<WebElement> trs = WebElementUtils.getByTagName(mutationSourceTable, WebElementUtils.TR_TAG);
         OptionalInt splitterCell = IntStream.range(0, trs.size())
             .filter(x -> WebElementUtils.getByTagName(trs.get(x), WebElementUtils.TD_TAG).get(0).getText()
                 .isEmpty())

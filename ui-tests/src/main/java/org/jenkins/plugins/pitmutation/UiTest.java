@@ -10,10 +10,21 @@ import org.jenkinsci.test.acceptance.po.WorkflowJob;
  * Base class for all UI tests. Provides several helper methods that can be used by all tests.
  */
 abstract class UiTest extends AbstractJUnitTest {
+
+    /**
+     * Creates and build a workflow job.
+     *
+     * @return The build.
+     */
     protected Build createAndBuildWorkflowJob() {
         return buildJob(createWorkflowJob());
     }
 
+    /**
+     * Creates a workflow job using the PitMutation Plugin and test data.
+     *
+     * @return The workflow job.
+     */
     protected WorkflowJob createWorkflowJob() {
         WorkflowJob job = jenkins.jobs.create(WorkflowJob.class);
         String zipFile = job.copyResourceStep("/PitMutationTest/testdata.zip");
@@ -30,6 +41,12 @@ abstract class UiTest extends AbstractJUnitTest {
         return job;
     }
 
+    /**
+     * Builds a workflow job.
+     *
+     * @param job The workflow job.
+     * @return The build.
+     */
     protected Build buildJob(final Job job) {
         return job.startBuild().waitUntilFinished();
     }

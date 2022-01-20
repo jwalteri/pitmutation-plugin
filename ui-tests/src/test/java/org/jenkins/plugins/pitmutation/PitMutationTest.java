@@ -32,8 +32,11 @@ public class PitMutationTest extends UiTest {
     private final static String SECOND_LEVEL = "null";
     private final static String THIRD_LEVEL = "edu.hm.hafner.util.PathUtil";
 
+    /**
+     * Checks the output console if the build was successful and the PitMutation plugin was used.
+     */
     @Test
-    public void BuildSuccessful() {
+    public void verifyConsoleOutput() {
         Build build = createAndBuildWorkflowJob();
         ConsoleView consoleView = new ConsoleView(build, "console");
 
@@ -41,8 +44,11 @@ public class PitMutationTest extends UiTest {
         assertThat(consoleView.getConsoleOutput()).contains("Finished: SUCCESS");
     }
 
+    /**
+     * Checks if the testExamined are displayed correctly.
+     */
     @Test
-    public void testExamined() {
+    public void verifyTestExamined() {
         MutationDetailView classView = getClassView();
 
         List<String> tests = classView.getTestsExamined();
@@ -52,6 +58,9 @@ public class PitMutationTest extends UiTest {
             "[test-template-invocation:#3] (8 ms)");
     }
 
+    /**
+     * Checks if the mutators are displayed correctly.
+     */
     @Test
     public void verifyMutators() {
         MutationDetailView classView = getClassView();
@@ -62,6 +71,9 @@ public class PitMutationTest extends UiTest {
         assertThat(mutators.get(0)).isEqualTo("CONDITIONALS_BOUNDARY");
     }
 
+    /**
+     * Checks if the information of a mutation is displayed correctly.
+     */
     @Test
     public void verifyMutationInformation() {
         MutationDetailView classView = getClassView();
@@ -74,6 +86,9 @@ public class PitMutationTest extends UiTest {
             "PathUtil::exists", "KILLED");
     }
 
+    /**
+     * Checks if the links are set correctly. Bidirectional linking of source and information of mutation.
+     */
     @Test
     public void verifySourceLink() {
         MutationDetailView classView = getClassView();
@@ -84,13 +99,16 @@ public class PitMutationTest extends UiTest {
         MutationInformationTable informationTable = classView.getMutationInformation();
         MutationInformationTableEntry informationEntry = informationTable.getDataEntries().get(ROW_KEY);
 
-        String sourceLink = extractPageAnker(sourceEntry.getLink());
-        String mutationLink = extractPageAnker(WebElementUtils.getAttribute(informationEntry.getClickable(),
+        String sourceLink = extractPageAnchor(sourceEntry.getLink());
+        String mutationLink = extractPageAnchor(WebElementUtils.getAttribute(informationEntry.getClickable(),
             WebElementUtils.LINK_ATTRIBUTE));
 
         assertThat(sourceLink).isEqualTo(mutationLink);
     }
 
+    /**
+     * Checks if the source area is displayed correctly.
+     */
     @Test
     public void verifySource() {
         MutationDetailView classView = getClassView();
@@ -102,9 +120,12 @@ public class PitMutationTest extends UiTest {
         assertThat(entry.getSourceCode()).contains("return Files.exists(Paths.get(fileName));");
         assertThat(entry.getMutationDetail()).contains("edu/hm/hafner/util/PathUtil::exists");
         assertThat(entry.getClickable().getText()).isEqualTo("2");
-        assertThat(extractPageAnker(entry.getLink())).isEqualTo("def930cd_42");
+        assertThat(extractPageAnchor(entry.getLink())).isEqualTo("def930cd_42");
     }
 
+    /**
+     * Checks if the links are set correctly. Bidirectional linking of component and source entries.
+     */
     @Test
     public void verifyClassComponentLink() {
         MutationDetailView classView = getClassView();
@@ -113,12 +134,15 @@ public class PitMutationTest extends UiTest {
         ClassComponentTableEntry entry = classTable.getDataEntries().get(0);
         MutationSourceTable sourceTable = classView.getMutationSource();
 
-        String componentLink = extractPageAnker(entry.getLink());
-        String sourceLink = extractPageAnker(sourceTable.getDataEntries().get(entry.getName()).getLink());
+        String componentLink = extractPageAnchor(entry.getLink());
+        String sourceLink = extractPageAnchor(sourceTable.getDataEntries().get(entry.getName()).getLink());
 
         assertThat(componentLink).isEqualTo(sourceLink);
     }
 
+    /**
+     * Checks if sorting is working.
+     */
     @Test
     public void verifySorting() {
         MutationDetailView classView = getClassView();
@@ -134,6 +158,9 @@ public class PitMutationTest extends UiTest {
         assertLastClassComponentTableEntry(classTable.getDataEntries().get(0));
     }
 
+    /**
+     * Checks if the component tables displays data correctly.
+     */
     @Test
     public void verifyComponents() {
         Build build = createAndBuildWorkflowJob();
@@ -169,7 +196,9 @@ public class PitMutationTest extends UiTest {
         assertFirstClassComponentTableEntry(classTable.getDataEntries().get(0));
     }
 
-
+    /**
+     * Checks if the mutation statistics displays data correctly.
+     */
     @Test
     public void verifyMutationStatistics() {
         Build build = createAndBuildWorkflowJob();
@@ -197,7 +226,9 @@ public class PitMutationTest extends UiTest {
         assertSingleStatistics(classStatistics);
     }
 
-
+    /**
+     * Checks if the table hierarchy is set and working correctly.
+     */
     @Test
     public void verifyMutationHierarchy() {
         Build build = createAndBuildWorkflowJob();
@@ -246,7 +277,11 @@ public class PitMutationTest extends UiTest {
         assertThat(baseView.getNavigation().getNavigationPoints()).isEmpty();
     }
 
-
+    /**
+     * Creates and builds a job and opens the class view.
+     *
+     * @return The classview.
+     */
     private MutationDetailView getClassView() {
         Build build = createAndBuildWorkflowJob();
 
@@ -267,10 +302,20 @@ public class PitMutationTest extends UiTest {
         return classView;
     }
 
-    private String extractPageAnker(String link) {
+    /**
+     * Extracts the identifying part of a page anchor.
+     *
+     * @param link The page anchor.
+     * @return The identifying part.
+     */
+    private String extractPageAnchor(String link) {
         return link.substring(link.indexOf("@") + 1);
     }
 
+    /**
+     * Asserts the last entry of the class component table.
+     * @param entry The last entry of the class component table.
+     */
     private void assertLastClassComponentTableEntry(ClassComponentTableEntry entry) {
         assertThat(entry.getName()).isEqualTo("275");
         assertThat(entry.getMutations()).isEqualTo("1");
@@ -282,6 +327,10 @@ public class PitMutationTest extends UiTest {
         assertThat(entry.getMutationDetail()).contains("EmptyObjectReturnVals");
     }
 
+    /**
+     * Asserts the first entry of the class component table.
+     * @param entry The first entry of the class component table.
+     */
     private void assertFirstClassComponentTableEntry(ClassComponentTableEntry entry) {
         assertThat(entry.getName()).isEqualTo(ROW_KEY);
         assertThat(entry.getMutations()).isEqualTo("2");
@@ -293,6 +342,10 @@ public class PitMutationTest extends UiTest {
         assertThat(entry.getMutationDetail()).contains("BooleanTrueReturnVals", "BooleanFalseReturnVals");
     }
 
+    /**
+     * Asserts the first entry of the component table on package level.
+     * @param entry The first entry of the component table on package level.
+     */
     private void assertPackageComponentTableEntry(ComponentTableEntry entry) {
         assertThat(entry.getName()).isEqualTo("Class: edu.hm.hafner.util.PathUtil");
         assertThat(entry.getMutations()).isEqualTo("33");
@@ -303,6 +356,10 @@ public class PitMutationTest extends UiTest {
         assertThat(entry.getCoverageDelta()).isEqualTo("+100.0%");
     }
 
+    /**
+     * Asserts the first entry of the component table on modules level.
+     * @param entry The first entry of the component table on modules level.
+     */
     private void assertFirstComponentTableEntry(ComponentTableEntry entry, String name) {
         assertThat(entry.getName()).isEqualTo(name);
         assertThat(entry.getMutations()).isEqualTo("189");
@@ -313,6 +370,10 @@ public class PitMutationTest extends UiTest {
         assertThat(entry.getCoverageDelta()).isEqualTo("+90.476%");
     }
 
+    /**
+     * Asserts the statistic on package level.
+     * @param statistics The statistic on package level.
+     */
     private void assertSingleStatistics(MutationStatistics statistics) {
         assertThat(statistics.getMutations().getName()).isEqualTo("Mutations");
         assertThat(statistics.getMutations().getValue()).isEqualTo("33 (+33)");
@@ -322,6 +383,10 @@ public class PitMutationTest extends UiTest {
         assertThat(statistics.getCoverage().getValue()).isEqualTo("100.0% (+100.0%)");
     }
 
+    /**
+     * Asserts the statistic on base level.
+     * @param statistics The statistic on base level.
+     */
     private void assertOverallStatistics(MutationStatistics statistics) {
         assertThat(statistics.getMutations().getName()).isEqualTo("Mutations");
         assertThat(statistics.getMutations().getValue()).isEqualTo("189 (+189)");

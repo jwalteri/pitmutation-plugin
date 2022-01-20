@@ -1,5 +1,6 @@
 package org.jenkins.plugins.pitmutation.tables.MutationSource;
 
+import org.jenkins.plugins.pitmutation.WebElementUtils;
 import org.jenkins.plugins.pitmutation.tables.AbstractMapTable;
 import org.openqa.selenium.WebElement;
 
@@ -20,13 +21,13 @@ public class MutationSourceTable extends AbstractMapTable<String, MutationSource
 
     @Override
     protected MutationSourceTableEntry rowToEntry(WebElement row) {
-        List<WebElement> tds = getTableCells(row);
+        List<WebElement> tds = WebElementUtils.getByTagName(row,WebElementUtils.TD_TAG);
 
         return new MutationSourceTableEntry(
             tds.get(0).getText(),
             tds.get(1).getText(),
             tds.get(2).getText(),
-            getLink(tds.get(1))
+            WebElementUtils.getLink(tds.get(1))
         );
     }
 
